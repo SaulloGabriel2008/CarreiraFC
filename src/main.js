@@ -1,14 +1,25 @@
 /**
- * CARREIRA FC - MAIN BOOTSTRAPPER
- * Orquestrador do ciclo de vida, navegação entre views e gerenciamento de estado global.
+ * CARREIRA FC - MAIN BOOTSTRAPPER & GAME STATE MANAGER
+ * Orquestrador central: Inicializa o fluxo de criação, gerencia as transições de tela
+ * e mantém o estado global acessível para módulos e depuração.
  */
 
-// Estado Global Provisório (Será integrado aos módulos em prompts subsequentes)
+import { Player } from './modules/player.js';
+import { getClubById } from './data/clubs.js';
+import { initCreationForm, renderDashboard } from './ui/renderer.js';
+
+// Estado Global Central da Aplicação
 export const gameState = {
   currentView: 'creation', // 'creation' | 'dashboard' | 'event' | 'retirement'
+  currentYear: 2026,
   player: null,
   isAudioEnabled: true
 };
+
+// Disponibiliza o gameState no window para facilidade de depuração e testes
+if (typeof window !== 'undefined') {
+  window.gameState = gameState;
+}
 
 /**
  * Alterna a visualização entre as views principais com animação suave
@@ -48,7 +59,7 @@ export function showToast(message, type = 'success', durationMs = 3000) {
 
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
-  toast.innerHTML = `<span>${type === 'gold' ? '🏆' : type === 'danger' ? '⚠️' : '✅'}</span> <span>${message}</span>`;
+  toast.innerHTML = `<span>${type === 'gold' ? '🏆' : type === 'danger' ? '⚠️' : '⚽'}</span> <span>${message}</span>`;
 
   container.appendChild(toast);
 
@@ -60,28 +71,60 @@ export function showToast(message, type = 'success', durationMs = 3000) {
   }, durationMs);
 }
 
-// Inicialização de Event Listeners Base
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('⚽ Carreira FC inicializado com sucesso [Sprint 1 - Prompt 1 Concluído].');
+/**
+ * Manipulador de Inicialização da Carreira Profissional
+ * @param {object} creationParams { name, nickname, position, archetype, currentClubId }
+ */
+export function handleStartCareer(creationParams) {
+  // 1. Instancia o objeto do Atleta com atributos da posição
+  const player = new Player({
+    name: creationParams.name,
+    nickname: creationParams.nickname,
+    position: creationParams.position,
+    archetype: creationParams.archetype,
+    currentClubId: creationParams.currentClubId,
+    age: 17
+  });
 
-  // Alternador de som / efeito visual
+  // 2. Atualiza estado global
+  gameState.player = player;
+  gameState.currentYear = 2026;
+
+  // 3. Renderiza o Dashboard inicial
+  renderDashboard(gameState.player, gameState.currentYear);
+
+  // 4. Alterna para o Dashboard com efeito visual
+  switchView('dashboard');
+
+  const club = getClubById(player.currentClubId);
+  const clubName = club ? club.shortName || club.name : "clube de formação";
+  showToast(`Carreira iniciada no ${clubName}! Mostre seu valor, garoto!`, 'gold', 4000);
+}
+
+// Inicialização de Listeners e ciclo de vida
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('⚽ Carreira FC: Inicializando motor de jogo [Prompt 4 Ativo].');
+
+  // Inicializa o formulário de criação com callbacks
+  initCreationForm(handleStartCareer);
+
+  // Botão de alternância de som / efeito
   const btnSound = document.getElementById('btn-sound-toggle');
   if (btnSound) {
     btnSound.addEventListener('click', () => {
       gameState.isAudioEnabled = !gameState.isAudioEnabled;
       btnSound.textContent = gameState.isAudioEnabled ? '🔊' : '🔇';
-      showToast(gameState.isAudioEnabled ? 'Sons ativados' : 'Sons desativados', 'gold', 1500);
+      showToast(gameState.isAudioEnabled ? 'Efeitos ativados' : 'Efeitos silenciados', 'gold', 1500);
     });
   }
 
-  // Seletor de botões de posição na view de criação
-  const posButtons = document.querySelectorAll('.pos-btn');
-  posButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      posButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+  // Placeholder para o botão Simular Temporada (será conectado ao motor no Prompt 5)
+  const btnSimulate = document.getElementById('btn-simulate-season');
+  if (btnSimulate) {
+    btnSimulate.addEventListener('click', () => {
+      showToast("Motor de Simulação será conectado no Prompt 5!", "gold", 2500);
     });
-  });
+  }
 
   // Listener para o botão de confirmação do modal genérico
   const modalCloseBtn = document.getElementById('modal-btn-confirm');
