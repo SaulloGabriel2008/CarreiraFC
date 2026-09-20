@@ -114,6 +114,14 @@ export const ASSET_PATHS = {
     comprar_carro_ostentacao: 'assets/images/events/event_carro_ostentacao.webp',
     reclamar_salario_atrasado: 'assets/images/events/event_empresario_luxo.webp',
     tatuagem_proibida: 'assets/images/events/event_noitada_pagode.webp',
+    doping_control_room: 'assets/images/events/event_doping_control_room.webp',
+    contract_ultimatum_desk: 'assets/images/events/event_contract_ultimatum_desk.webp',
+    fans_protest_ct_gates: 'assets/images/events/event_fans_protest_ct_gates.webp',
+    casino_vip_cards: 'assets/images/events/event_casino_vip_cards.webp',
+    celebrity_red_carpet: 'assets/images/events/event_celebrity_red_carpet.webp',
+    charity_favela_kickabout: 'assets/images/events/event_charity_favela_kickabout.webp',
+    referee_heated_argument: 'assets/images/events/event_referee_heated_argument.webp',
+    sponsorship_shoe_deal: 'assets/images/events/event_sponsorship_shoe_deal.webp',
   },
 
   // Cutscenes de Momentos Críticos de Partida
@@ -123,6 +131,13 @@ export const ASSET_PATHS = {
     tackle_duel: 'assets/images/moments/moment_tackle_duel.webp',
     freekick_topcorner: 'assets/images/moments/moment_freekick_topcorner.webp',
     goalkeeper_save: 'assets/images/moments/moment_goalkeeper_save.webp',
+    bicycle_kick_spectacular: 'assets/images/moments/moment_bicycle_kick_spectacular.webp',
+    red_card_walkoff: 'assets/images/moments/moment_red_card_walkoff.webp',
+    tactical_coach_huddle: 'assets/images/moments/moment_tactical_coach_huddle.webp',
+    captain_armband_swap: 'assets/images/moments/moment_captain_armband_swap.webp',
+    dribble_nutmeg_action: 'assets/images/moments/moment_dribble_nutmeg_action.webp',
+    header_bullet_cross: 'assets/images/moments/moment_header_bullet_cross.webp',
+    wall_block_bruise: 'assets/images/moments/moment_wall_block_bruise.webp',
   },
 
   // Telas e Pôsteres de Glória & Desfecho
@@ -131,6 +146,29 @@ export const ASSET_PATHS = {
     ballon_dor_gala: 'assets/images/glory/glory_ballon_dor_gala.webp',
     elimination_heartbreak: 'assets/images/glory/glory_elimination_heartbreak.webp',
     retirement_locker: 'assets/images/glory/glory_retirement_locker.webp',
+  },
+
+  // Estádios & Atmosfera de Torcida
+  stadiums: {
+    derby_flares_smoke: 'assets/images/stadiums/stadium_derby_flares_smoke.webp',
+    bus_arrival_crowd: 'assets/images/stadiums/stadium_bus_arrival_crowd.webp',
+    aerial_floodlights_night: 'assets/images/stadiums/stadium_aerial_floodlights_night.webp',
+    empty_dawn_training: 'assets/images/stadiums/stadium_empty_dawn_training.webp',
+    monumental_entrance_gate: 'assets/images/stadiums/stadium_monumental_entrance_gate.webp',
+    standing_terrace_rain: 'assets/images/stadiums/stadium_standing_terrace_rain.webp',
+    var_screen_tension: 'assets/images/stadiums/stadium_var_screen_tension.webp',
+  },
+
+  // Vida do Atleta & Bastidores
+  lifestyle: {
+    gym_weight_training: 'assets/images/lifestyle/lifestyle_gym_weight_training.webp',
+    ice_bath_recovery: 'assets/images/lifestyle/lifestyle_ice_bath_recovery.webp',
+    private_jet_transfer: 'assets/images/lifestyle/lifestyle_private_jet_transfer.webp',
+    press_conference_flash: 'assets/images/lifestyle/lifestyle_press_conference_flash.webp',
+    agent_dinner_deal: 'assets/images/lifestyle/lifestyle_agent_dinner_deal.webp',
+    family_mansion_garden: 'assets/images/lifestyle/lifestyle_family_mansion_garden.webp',
+    tactical_video_analysis: 'assets/images/lifestyle/lifestyle_tactical_video_analysis.webp',
+    luxury_watch_collection: 'assets/images/lifestyle/lifestyle_luxury_watch_collection.webp',
   },
 
   // Fundos de Imersão e Atmosfera
@@ -158,6 +196,24 @@ export class AssetManager {
    */
   static getGloryImage(key) {
     return ASSET_PATHS.glory[key] || '';
+  }
+
+  /**
+   * Retorna o caminho de imagem atmosférica de estádio ou torcida
+   * @param {string} key 
+   * @returns {string}
+   */
+  static getStadiumImage(key) {
+    return ASSET_PATHS.stadiums[key] || '';
+  }
+
+  /**
+   * Retorna o caminho de imagem de lifestyle ou bastidores
+   * @param {string} key 
+   * @returns {string}
+   */
+  static getLifestyleImage(key) {
+    return ASSET_PATHS.lifestyle[key] || '';
   }
   /**
    * Retorna o caminho do ícone de atributo ou UI
