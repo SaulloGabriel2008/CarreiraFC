@@ -175,14 +175,18 @@
               </div>
             </div>
           </div>
-          <div style="display: flex; gap: 0.75rem; align-items: center;">
-            <div class="stat-box stat-highlight" style="min-width: 90px;">
+          <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+            <div class="stat-box stat-highlight" style="min-width: 80px;">
               <div class="stat-value" id="dash-overall">68</div>
               <div class="stat-label">Overall</div>
             </div>
-            <div class="stat-box" style="min-width: 90px;">
+            <div class="stat-box" style="min-width: 80px;">
               <div class="stat-value" id="dash-physical">85</div>
               <div class="stat-label">Físico</div>
+            </div>
+            <div class="stat-box" style="min-width: 105px; border-color: rgba(255, 193, 7, 0.45); background: rgba(255, 193, 7, 0.05);">
+              <div class="stat-value" id="dash-finances" style="color: var(--accent-gold); font-size: 1.05rem;">R$ 35 mil</div>
+              <div class="stat-label" style="color: var(--accent-gold);">💰 Carteira</div>
             </div>
           </div>
         </div>
@@ -195,7 +199,10 @@
               Pronto para entrar em campo
             </span>
           </div>
-          <div style="display: flex; gap: 0.5rem;">
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button id="btn-open-lifestyle" class="btn btn-gold btn-md" title="Gerenciar Estilo de Vida, Staff e Investimentos">
+              💎 Vida & Fortuna
+            </button>
             <button id="btn-simulate-season" class="btn btn-primary btn-lg">
               ⚽ Simular Temporada
             </button>
@@ -339,6 +346,33 @@
       </div>
       <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 0.5rem;">
         <button id="modal-btn-confirm" class="btn btn-primary">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Vida & Fortuna (Lifestyle, Bens, Staff e Investimentos) -->
+  <div id="modal-lifestyle" class="modal-overlay">
+    <div class="modal-dialog lifestyle-modal-dialog">
+      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+        <div>
+          <h3 class="card-title" style="color: var(--accent-gold); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem;">
+            <span>💎</span> Vida & Fortuna
+          </h3>
+          <div style="font-size: 0.85rem; color: var(--text-secondary);">
+            Saldo em Conta: <b id="lifestyle-current-balance" style="color: var(--accent-green); font-size: 0.95rem;">R$ 0</b>
+          </div>
+        </div>
+        <button id="btn-close-lifestyle" class="btn btn-secondary btn-sm" style="font-size: 1.2rem; line-height: 1; padding: 0.35rem 0.65rem;" title="Fechar">&times;</button>
+      </div>
+
+      <!-- Abas de Categorias -->
+      <div class="lifestyle-tabs-bar" id="lifestyle-tabs-bar">
+        <!-- Injetado dinamicamente -->
+      </div>
+
+      <!-- Grid de Itens da Categoria Ativa -->
+      <div class="lifestyle-items-container" id="lifestyle-items-container">
+        <!-- Injetado dinamicamente -->
       </div>
     </div>
   </div>

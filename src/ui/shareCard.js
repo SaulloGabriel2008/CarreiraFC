@@ -5,6 +5,7 @@
  */
 
 import { formatMoney } from './renderer.js';
+import { getLifestyleItemById } from '../data/lifestyle.js';
 
 export class ShareCardRenderer {
   /**
@@ -70,6 +71,29 @@ export class ShareCardRenderer {
         `;
       }
 
+      // Conquistas de Vida & Fortuna
+      let lifestyleItemsHtml = '';
+      if (player.lifestyle && player.lifestyle.items && player.lifestyle.items.length > 0) {
+        const uniqueItemIds = [...new Set(player.lifestyle.items)];
+        const itemsData = uniqueItemIds.map(id => getLifestyleItemById(id)).filter(Boolean);
+        const itemsBadges = itemsData.map(it => `
+          <span class="trophy-item" style="background: rgba(255, 193, 7, 0.15); border-color: rgba(255, 193, 7, 0.35); font-size: 0.75rem;">
+            ${it.icon} ${it.name}
+          </span>
+        `).join('');
+
+        lifestyleItemsHtml = `
+          <div style="margin-bottom: 0.75rem;">
+            <div style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 700; text-transform: uppercase; margin-bottom: 0.35rem;">
+              💎 Vida & Fortuna: ${legacy.lifestyleStatus}
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center;">
+              ${itemsBadges}
+            </div>
+          </div>
+        `;
+      }
+
       // Clubes defendidos
       const clubsMap = {};
       player.history.forEach(h => {
@@ -78,10 +102,11 @@ export class ShareCardRenderer {
       const clubsText = Object.entries(clubsMap).map(([c, yrs]) => `${c} (${yrs} ${yrs === 1 ? 'ano' : 'anos'})`).join(' • ');
 
       extrasContainer.innerHTML += `
-        <div style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+        ${lifestyleItemsHtml}
+        <div style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.45rem;">
           <b>Clubes Defendidos:</b> ${clubsText || player.currentClubId}
         </div>
-        <div style="font-size: 0.8rem; color: var(--accent-green); font-weight: 700;">
+        <div style="font-size: 0.82rem; color: var(--accent-green); font-weight: 700;">
           Patrimônio Acumulado na Carreira: ${formatMoney(player.finances)}
         </div>
       `;
@@ -109,6 +134,9 @@ export class ShareCardRenderer {
 Nome: ${player.name}${nick}
 Posição: ${player.position}
 Status Final: ${legacy.tier} ("${legacy.legacyTitle}")
+💎 Estilo de Vida: ${legacy.lifestyleStatus}
+💰 Fortuna Construída: ${formatMoney(player.finances)}
+
 📊 Estatísticas de Carreira:
 - ${player.careerStats.totalGames} Partidas
 - ${player.careerStats.totalGoals} Gols Marcados

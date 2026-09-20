@@ -50,6 +50,13 @@ export class Player {
     this.marketValue = params.marketValue || this.calculateMarketValue();
     this.finances = params.finances || 35000;
 
+    // Estilo de Vida, Staff e Investimentos (Vida & Fortuna)
+    this.lifestyle = params.lifestyle || {
+      items: [],
+      totalPassiveIncome: 0,
+      perks: []
+    };
+
     // Carreira e Estatísticas Acumuladas
     this.careerStats = params.careerStats || {
       totalGames: 0,
@@ -271,6 +278,18 @@ export class Player {
       physicalDelta = -(Math.floor(Math.random() * 4) + 2); // -2 a -5
     }
 
+    // Bônus de Perks de Vida & Fortuna (Personal Trainer / Fisioterapeuta / Jatinho)
+    if (this.hasPerk('personal_trainer') && this.age <= 24) {
+      overallDelta = Math.max(1, overallDelta + 1);
+    }
+    if (this.hasPerk('fisio_elite') && physicalDelta < 0) {
+      // Amortece 60% da perda física da velhice
+      physicalDelta = Math.min(-1, Math.round(physicalDelta * 0.4));
+    }
+    if (this.hasPerk('jatinho_descanso') && physicalDelta < 0) {
+      physicalDelta = Math.min(0, physicalDelta + 1);
+    }
+
     // Bônus de Treino
     if (trainingFocus === 'physical') {
       physicalDelta += 2;
@@ -289,6 +308,11 @@ export class Player {
     this.overall = this.calculateOverall();
     this.marketValue = this.calculateMarketValue();
 
+    // Blindagem de Coach Mental
+    if (this.hasPerk('coach_mental')) {
+      this.morale = Math.max(65, this.morale);
+    }
+
     if (this.overall > this.peakOverall) {
       this.peakOverall = this.overall;
     }
@@ -305,6 +329,90 @@ export class Player {
       newOverall: this.overall,
       newPhysical: this.physical
     };
+  }
+
+  /**
+   * Checa se o jogador adquiriu um item específico de estilo de vida
+   * @param {string} itemId 
+   * @returns {boolean}
+   */
+  hasLifestyleItem(itemId) {
+    return !!(this.lifestyle && this.lifestyle.items && this.lifestyle.items.includes(itemId));
+  }
+
+  /**
+   * Checa se o jogador possui um benefício passivo (perk)
+   * @param {string} perkId 
+   * @returns {boolean}
+   */
+  hasPerk(perkId) {
+    return !!(this.lifestyle && this.lifestyle.perks && this.lifestyle.perks.includes(perkId));
+  }
+
+  /**
+   * Realiza a compra instantânea de um item de Vida & Fortuna
+   * @param {object} item Objeto do catálogo LIFESTYLE_ITEMS
+   * @returns {object} { success: boolean, reason?: string, item?: object, gambleWon?: boolean }
+   */
+  buyLifestyleItem(item) {
+    if (this.finances < item.price) {
+      return { success: false, reason: "Saldo insuficiente na carteira!" };
+    }
+
+    // Inicializa estrutura caso não exista
+    if (!this.lifestyle) {
+      this.lifestyle = { items: [], totalPassiveIncome: 0, perks: [] };
+    }
+
+    // Deduz o custo
+    this.finances -= item.price;
+
+    // Tratamento especial para negócios de alto risco (Gamble)
+    if (item.isGamble) {
+      const gambleWon = Math.random() < 0.50; // 50% de chance
+      if (gambleWon) {
+        const payout = 450000;
+        this.finances += payout;
+        this.morale = Math.min(100, this.morale + 20);
+        this.reputation = Math.min(100, this.reputation + 10);
+        this.lifestyle.items.push(item.id);
+        return { success: true, gambleWon: true, payout, item };
+      } else {
+        this.morale = Math.max(10, this.morale - 15);
+        if (this.hasPerk('coach_mental')) this.morale = Math.max(65, this.morale);
+        return { success: true, gambleWon: false, payout: 0, item };
+      }
+    }
+
+    // Registro do item
+    this.lifestyle.items.push(item.id);
+
+    // Registro do Perk
+    if (item.perkId && !this.lifestyle.perks.includes(item.perkId)) {
+      this.lifestyle.perks.push(item.perkId);
+    }
+
+    // Incremento de Renda Passiva anual
+    if (item.passiveIncome) {
+      this.lifestyle.totalPassiveIncome = (this.lifestyle.totalPassiveIncome || 0) + item.passiveIncome;
+    }
+
+    // Bônus Imediatos
+    if (item.moraleBonus) {
+      this.morale = Math.min(100, this.morale + item.moraleBonus);
+    }
+    if (item.reputationBonus) {
+      this.reputation = Math.min(100, this.reputation + item.reputationBonus);
+    }
+    if (item.physicalBonus) {
+      this.physical = Math.min(99, this.physical + item.physicalBonus);
+    }
+
+    if (this.hasPerk('coach_mental')) {
+      this.morale = Math.max(65, this.morale);
+    }
+
+    return { success: true, item };
   }
 
   /**
@@ -341,7 +449,10 @@ export class Player {
     const weightedRatingSum = this.history.reduce((acc, h) => acc + (h.rating * h.games), 0);
     this.careerStats.averageRating = totalRatedGames > 0 ? +(weightedRatingSum / totalRatedGames).toFixed(2) : 0;
 
-    this.finances += Math.round(this.wage * 13);
+    // Salário Anual + Rendimentos de Investimentos
+    const passiveEarnings = this.lifestyle ? (this.lifestyle.totalPassiveIncome || 0) : 0;
+    this.finances += Math.round(this.wage * 13) + passiveEarnings;
+    seasonData.passiveEarnings = passiveEarnings;
 
     // =========================================================================
     // AJUSTE DO POTENCIAL DINÂMICO OCULTO POR DESEMPENHO (Fog of War)
@@ -386,7 +497,17 @@ export class Player {
     const awardsScore = this.careerStats.individualAwards.length * 60;
     const peakBonus = Math.max(0, this.peakOverall - 70) * 22;
 
-    const totalScore = Math.round(goalsScore + assistsScore + gamesScore + trophiesScore + awardsScore + peakBonus);
+    // Pontuação de Estilo de Vida e Fortuna
+    let lifestyleScore = 0;
+    if (this.lifestyle && this.lifestyle.items) {
+      lifestyleScore = this.lifestyle.items.length * 20;
+      if (this.hasPerk('dono_de_clube')) lifestyleScore += 350;
+      if (this.hasPerk('instituto_social')) lifestyleScore += 250;
+      if (this.hasLifestyleItem('jatinho_particular')) lifestyleScore += 180;
+      if (this.hasPerk('casa_mae')) lifestyleScore += 80;
+    }
+
+    const totalScore = Math.round(goalsScore + assistsScore + gamesScore + trophiesScore + awardsScore + peakBonus + lifestyleScore);
 
     let tier = "Promessa Inacabada";
     let legacyTitle = "Cigano da Bola";
@@ -405,10 +526,28 @@ export class Player {
       legacyTitle = "Guerreiro dos Gramados";
     }
 
+    // Título Social & Estilo de Vida
+    let lifestyleStatus = "Vida Modesta";
+    if (this.hasPerk('dono_de_clube')) {
+      lifestyleStatus = "👑 Dono de Clube & Magnata";
+    } else if (this.hasPerk('instituto_social')) {
+      lifestyleStatus = "🤝 Ídolo do Povo & Benfeitor";
+    } else if (this.hasLifestyleItem('jatinho_particular')) {
+      lifestyleStatus = "✈️ Superstar dos Gramados";
+    } else if (this.hasLifestyleItem('mansao_alphaville') || this.hasLifestyleItem('superesportivo')) {
+      lifestyleStatus = "💎 Rei da Noite & Ostentação";
+    } else if (this.hasPerk('casa_mae')) {
+      lifestyleStatus = "❤️ Filho de Ouro";
+    } else if (this.lifestyle && this.lifestyle.items && this.lifestyle.items.length >= 3) {
+      lifestyleStatus = "💼 Boleiro Bem de Vida";
+    }
+
     return {
       score: totalScore,
       tier,
       legacyTitle,
+      lifestyleStatus,
+      lifestyleItemsCount: this.lifestyle?.items?.length || 0,
       totalGames: this.careerStats.totalGames,
       totalGoals: this.careerStats.totalGoals,
       totalAssists: this.careerStats.totalAssists,

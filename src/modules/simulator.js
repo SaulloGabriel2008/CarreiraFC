@@ -88,8 +88,11 @@ export class SeasonSimulator {
       });
     });
 
-    // Média ponderada da nota do ano
-    const avgRating = totalGames > 0 ? +(ratingSum / totalGames).toFixed(2) : 6.00;
+    // Média ponderada da nota do ano (com bônus de Chef/Nutricionista se contratado)
+    let avgRating = totalGames > 0 ? +(ratingSum / totalGames).toFixed(2) : 6.00;
+    if (player.hasPerk && player.hasPerk('chef_nutricao')) {
+      avgRating = +(Math.min(9.99, avgRating + 0.15)).toFixed(2);
+    }
 
     // Se houve lesão, reduz temporariamente um pouco do físico
     if (injuryOccurred) {
@@ -106,7 +109,8 @@ export class SeasonSimulator {
       avgRating,
       trophiesWon,
       competitionsSummary,
-      injuryOccurred
+      injuryOccurred,
+      playerWage: player.wage
     };
   }
 
@@ -116,9 +120,11 @@ export class SeasonSimulator {
    */
   static _checkSeasonInjury(player, archetype) {
     const injuryRiskMult = archetype.modifiers.injuryRisk || 1.0;
+    // Fisioterapeuta de elite & câmara hiperbárica protege contra lesões musculares
+    const fisioProtection = (player.hasPerk && player.hasPerk('fisio_elite')) ? 0.45 : 1.0;
     // Físico alto (85+) -> 8% chance base. Físico baixo (55-) -> 30% chance base.
     const baseRisk = Math.max(0.06, (100 - player.physical) / 100 * 0.35);
-    return Math.random() < (baseRisk * injuryRiskMult);
+    return Math.random() < (baseRisk * injuryRiskMult * fisioProtection);
   }
 
   /**

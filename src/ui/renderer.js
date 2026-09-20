@@ -6,6 +6,7 @@
 
 import { POSITIONS, getArchetypesByPosition, getArchetypeById } from '../data/archetypes.js';
 import { getRandomStartingClubs, getClubById } from '../data/clubs.js';
+import { LIFESTYLE_CATEGORIES, LIFESTYLE_ITEMS, getItemsByCategory, getLifestyleItemById } from '../data/lifestyle.js';
 
 /**
  * Formata valores monetários no padrão brasileiro amigável (R$ mil / R$ mi)
@@ -205,11 +206,26 @@ export function renderDashboard(player, currentYear = 2026) {
   if (physicalEl) {
     physicalEl.textContent = player.physical;
   }
+
+  // Atualiza saldo na carteira
+  const financesEl = document.getElementById('dash-finances');
+  if (financesEl) {
+    financesEl.textContent = formatMoney(player.finances);
+  }
+
   if (tournamentBadge) {
     tournamentBadge.textContent = `🏆 Temporada ${currentYear}`;
   }
   if (btnSimulate) {
     btnSimulate.innerHTML = `⚽ Simular Temporada ${currentYear}`;
+  }
+
+  // Conecta o botão de Vida & Fortuna
+  const btnOpenLifestyle = document.getElementById('btn-open-lifestyle');
+  if (btnOpenLifestyle) {
+    btnOpenLifestyle.onclick = () => {
+      openLifestyleModal(player, currentYear);
+    };
   }
 
   // 3. Sala de Troféus
@@ -258,10 +274,9 @@ export function renderDashboard(player, currentYear = 2026) {
       `;
     } else {
       historyTbody.innerHTML = '';
-      // Exibe da temporada mais recente para a mais antiga
-      [...player.history].reverse().forEach(row => {
+      player.history.forEach(row => {
         const tr = document.createElement('tr');
-        const trophiesStr = row.trophiesWon && row.trophiesWon.length > 0 
+        const trophiesStr = (row.trophiesWon && row.trophiesWon.length > 0)
           ? row.trophiesWon.map(t => `🏆 ${t.name}`).join(', ')
           : '-';
 
@@ -278,6 +293,201 @@ export function renderDashboard(player, currentYear = 2026) {
         historyTbody.appendChild(tr);
       });
     }
+  }
+}
+
+// =========================================================================
+// SISTEMA DE MODAL: VIDA & FORTUNA (LIFESTYLE)
+// =========================================================================
+let currentLifestyleCategory = 'garage';
+
+function notifyToast(message, type = 'success', durationMs = 4500) {
+  if (typeof window !== 'undefined' && typeof window.showToast === 'function') {
+    window.showToast(message, type, durationMs);
+    return;
+  }
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `<span>${type === 'gold' ? '🏆' : type === 'danger' ? '⚠️' : '⚽'}</span> <span>${message}</span>`;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(40px)';
+    toast.style.transition = 'all 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, durationMs);
+}
+
+/**
+ * Abre o Modal de Vida & Fortuna
+ * @param {Player} player 
+ * @param {number} currentYear 
+ */
+export function openLifestyleModal(player, currentYear = 2026) {
+  const modal = document.getElementById('modal-lifestyle');
+  const btnClose = document.getElementById('btn-close-lifestyle');
+  const balanceEl = document.getElementById('lifestyle-current-balance');
+  const tabsBar = document.getElementById('lifestyle-tabs-bar');
+
+  if (!modal) return;
+
+  if (btnClose) {
+    btnClose.onclick = () => closeLifestyleModal();
+  }
+
+  // Atualiza exibição de saldo no cabeçalho do modal
+  if (balanceEl) {
+    balanceEl.textContent = formatMoney(player.finances);
+  }
+
+  // Renderiza as abas de categorias
+  if (tabsBar) {
+    tabsBar.innerHTML = '';
+    LIFESTYLE_CATEGORIES.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `lifestyle-tab-btn ${cat.id === currentLifestyleCategory ? 'active' : ''}`;
+      btn.textContent = cat.name;
+      btn.onclick = () => {
+        currentLifestyleCategory = cat.id;
+        document.querySelectorAll('.lifestyle-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderLifestyleItems(player, currentLifestyleCategory, currentYear);
+      };
+      tabsBar.appendChild(btn);
+    });
+  }
+
+  renderLifestyleItems(player, currentLifestyleCategory, currentYear);
+  modal.classList.add('active');
+}
+
+/**
+ * Fecha o Modal de Vida & Fortuna
+ */
+export function closeLifestyleModal() {
+  const modal = document.getElementById('modal-lifestyle');
+  if (modal) modal.classList.remove('active');
+}
+
+/**
+ * Renderiza os itens da categoria ativa no modal
+ * @param {Player} player 
+ * @param {string} categoryId 
+ * @param {number} currentYear 
+ */
+export function renderLifestyleItems(player, categoryId, currentYear = 2026) {
+  const container = document.getElementById('lifestyle-items-container');
+  const balanceEl = document.getElementById('lifestyle-current-balance');
+  if (!container) return;
+
+  if (balanceEl) {
+    balanceEl.textContent = formatMoney(player.finances);
+  }
+
+  const items = getItemsByCategory(categoryId);
+  container.innerHTML = '';
+
+  if (items.length === 0) {
+    container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 2rem;">Nenhum item nesta categoria.</div>`;
+    return;
+  }
+
+  items.forEach(item => {
+    const isPurchased = player.hasLifestyleItem(item.id);
+    const hasEnoughMoney = player.finances >= item.price;
+    const isRepeatable = !!item.isRepeatable;
+
+    // Contagem de compras para itens repetíveis (como cotas)
+    let purchaseCount = 0;
+    if (player.lifestyle && player.lifestyle.items) {
+      purchaseCount = player.lifestyle.items.filter(id => id === item.id).length;
+    }
+
+    const card = document.createElement('div');
+    card.className = `lifestyle-card ${isPurchased && !isRepeatable ? 'acquired' : ''}`;
+
+    let actionBtnHtml = '';
+    if (isPurchased && !isRepeatable) {
+      actionBtnHtml = `<button class="btn btn-secondary btn-sm" disabled style="opacity: 0.85; border-color: rgba(0, 230, 118, 0.4); color: var(--accent-green);">Adquirido ✅</button>`;
+    } else if (!hasEnoughMoney) {
+      const diff = item.price - player.finances;
+      actionBtnHtml = `<button class="btn btn-secondary btn-sm" disabled title="Saldo insuficiente na carteira">Falta ${formatMoney(diff)}</button>`;
+    } else {
+      const label = isRepeatable && purchaseCount > 0 ? `Comprar Outro (${formatMoney(item.price)})` : (item.isGamble ? `Apostar (${formatMoney(item.price)})` : `Comprar (${formatMoney(item.price)})`);
+      actionBtnHtml = `<button class="btn ${item.isGamble ? 'btn-danger' : 'btn-gold'} btn-sm btn-buy-lifestyle" data-item-id="${item.id}">${label}</button>`;
+    }
+
+    const statusBadge = isRepeatable && purchaseCount > 0 ? ` <span class="badge badge-pos" style="font-size: 0.72rem;">${purchaseCount}x adquirido</span>` : '';
+
+    card.innerHTML = `
+      <div class="lifestyle-card-icon">${item.icon}</div>
+      <div class="lifestyle-card-info">
+        <div class="lifestyle-card-title">
+          <span>${item.name}</span>
+          ${statusBadge}
+        </div>
+        <div class="lifestyle-card-desc">${item.desc}</div>
+        <span class="lifestyle-benefit-badge">✨ ${item.benefitDesc}</span>
+      </div>
+      <div class="lifestyle-card-action">
+        <div class="lifestyle-price-tag">${formatMoney(item.price)}</div>
+        ${actionBtnHtml}
+      </div>
+    `;
+
+    const buyBtn = card.querySelector('.btn-buy-lifestyle');
+    if (buyBtn) {
+      buyBtn.onclick = () => {
+        handleBuyItem(player, item, currentYear);
+      };
+    }
+
+    container.appendChild(card);
+  });
+}
+
+/**
+ * Processa a compra instantânea e feedback na interface
+ * @param {Player} player 
+ * @param {object} item 
+ * @param {number} currentYear 
+ */
+function handleBuyItem(player, item, currentYear) {
+  const result = player.buyLifestyleItem(item);
+  if (!result.success) {
+    notifyToast(result.reason || "Não foi possível realizar a compra.", "danger");
+    return;
+  }
+
+  // Notificações temáticas
+  if (item.isGamble) {
+    if (result.gambleWon) {
+      notifyToast(`🔥 DEU BOM DEMAIS! O parça acertou em cheio e você embolsou ${formatMoney(result.payout)} (+R$ 300 mil de lucro)!`, "gold", 5500);
+    } else {
+      notifyToast(`💥 GOLPE DO PARÇA! O projeto naufragou, você perdeu ${formatMoney(item.price)} e virou piada no elenco!`, "danger", 5500);
+    }
+  } else if (item.id === 'casa_mae') {
+    notifyToast(`❤️ PROMESSA CUMPRIDA! Você entregou as chaves da casa própria da sua mãe! (+25 Moral)!`, "gold", 6000);
+  } else if (item.id === 'comprar_clube') {
+    notifyToast(`👑 HISTÓRICO! Você agora é o Presidente & Dono do Clube! +30 Reputação e dividendos anuais!`, "gold", 6000);
+  } else if (item.id === 'instituto_social') {
+    notifyToast(`🤝 ORGULHO DA QUEBRADA! O Instituto Social foi inaugurado com festa! +25 Reputação!`, "gold", 6000);
+  } else {
+    notifyToast(`🎉 Parabéns! Você adquiriu ${item.name}! (${item.benefitDesc})`, "gold", 4000);
+  }
+
+  // Atualiza dashboard e modal instantaneamente
+  renderDashboard(player, currentYear);
+  renderLifestyleItems(player, currentLifestyleCategory, currentYear);
+
+  // Sincroniza save se o StorageService estiver acessível via window.gameState
+  if (typeof window !== 'undefined' && window.gameState && window.StorageService) {
+    window.StorageService.saveGame(window.gameState);
   }
 }
 
@@ -360,6 +570,15 @@ export function showSeasonModal(seasonReport, progression, onContinueCallback) {
       </div>
       <div class="competitions-list">
         ${compsHtml}
+      </div>
+
+      <!-- Balanço Financeiro da Temporada -->
+      <div class="comp-item" style="border-color: rgba(255, 193, 7, 0.45); background: rgba(255, 193, 7, 0.05); margin-top: 0.6rem; border-left: 4px solid var(--accent-gold);">
+        <span>💰 <b>Ganhos Financeiros do Ano</b></span>
+        <span style="font-size: 0.85rem; font-weight: 700; color: var(--accent-gold);">
+          +${formatMoney(seasonReport.playerWage ? seasonReport.playerWage * 13 : 0)} 
+          ${seasonReport.passiveEarnings ? `<small style="color: var(--accent-green); font-weight: 700;">(+${formatMoney(seasonReport.passiveEarnings)} rendimentos)</small>` : ''}
+        </span>
       </div>
 
       <!-- Evolução de Atributos -->

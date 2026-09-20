@@ -33,6 +33,8 @@ export const gameState = {
 // Disponibiliza o gameState no escopo global para testes e depuração
 if (typeof window !== 'undefined') {
   window.gameState = gameState;
+  window.showToast = showToast;
+  window.StorageService = StorageService;
 }
 
 /**
