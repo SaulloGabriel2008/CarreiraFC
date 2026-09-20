@@ -10,6 +10,7 @@ export const POSITIONS = {
     short: "GOL",
     category: "defesa",
     icon: "🧤",
+    materialIcon: "sports_handball",
     description: "Guardião da meta. Decisivo em cobranças de pênaltis e milagres no mano a mano.",
     pitchCoords: { top: 86, left: 50 } // Coordenadas percentuais no campo
   },
@@ -19,6 +20,7 @@ export const POSITIONS = {
     short: "ZAG",
     category: "defesa",
     icon: "🛡️",
+    materialIcon: "shield",
     description: "Pilar defensivo central. Desarmes pontuais, imposição física e presença na bola aérea.",
     pitchCoords: { top: 72, left: 50 }
   },
@@ -28,6 +30,7 @@ export const POSITIONS = {
     short: "LD",
     category: "defesa",
     icon: "🏃‍♂️",
+    materialIcon: "arrow_forward",
     description: "Dono do corredor direito. Apoio veloz ao ataque, cruzamentos na área e cobertura na linha de fundo.",
     pitchCoords: { top: 68, left: 82 }
   },
@@ -37,6 +40,7 @@ export const POSITIONS = {
     short: "LE",
     category: "defesa",
     icon: "🏃‍♂️",
+    materialIcon: "arrow_back",
     description: "Dono do corredor esquerdo. Arrancadas fulminantes, tabelas ofensivas e recuperação defensiva.",
     pitchCoords: { top: 68, left: 18 }
   },
@@ -46,6 +50,7 @@ export const POSITIONS = {
     short: "VOL",
     category: "meio",
     icon: "🧱",
+    materialIcon: "fence",
     description: "O cão de guarda da cabeça de área. Desarmes implacáveis, proteção à zaga e vigor incansável.",
     pitchCoords: { top: 55, left: 50 }
   },
@@ -55,6 +60,7 @@ export const POSITIONS = {
     short: "MC",
     category: "meio",
     icon: "⚙️",
+    materialIcon: "tune",
     description: "O motor do time. Ditador de ritmo, transição veloz da defesa ao ataque e passes de ruptura.",
     pitchCoords: { top: 43, left: 34 }
   },
@@ -64,6 +70,7 @@ export const POSITIONS = {
     short: "MEI",
     category: "meio",
     icon: "🎯",
+    materialIcon: "crisis_alert",
     description: "O camisa 10 clássico. Visão de jogo, assistências açucaradas e chutes perigosos de média distância.",
     pitchCoords: { top: 35, left: 66 }
   },
@@ -73,6 +80,7 @@ export const POSITIONS = {
     short: "PE",
     category: "ataque",
     icon: "⚡",
+    materialIcon: "bolt",
     description: "Extremo agudo pela esquerda. Dribles no mano a mano, infiltrações diagonais e finalizações perigosas.",
     pitchCoords: { top: 20, left: 20 }
   },
@@ -82,6 +90,7 @@ export const POSITIONS = {
     short: "PD",
     category: "ataque",
     icon: "⚡",
+    materialIcon: "bolt",
     description: "Extremo agudo pela direita. Velocidade terminal, linha de fundo, cruzamentos venenosos e cortes para o meio.",
     pitchCoords: { top: 20, left: 80 }
   },
@@ -91,6 +100,7 @@ export const POSITIONS = {
     short: "CA",
     category: "ataque",
     icon: "⚽",
+    materialIcon: "sports_soccer",
     description: "A referência letal da área. Faro apurado de gol, oportunismo de finalização e presença física entre os zagueiros.",
     pitchCoords: { top: 12, left: 50 }
   }

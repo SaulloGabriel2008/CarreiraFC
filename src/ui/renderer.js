@@ -131,8 +131,8 @@ export function initCreationForm(onStartCareerCallback) {
     }
 
     if (selectedPosDisplay) {
-      const posInfo = POSITIONS[posCode] || { name: posCode, icon: "⚽" };
-      selectedPosDisplay.innerHTML = `${posInfo.icon} ${posCode} - ${posInfo.name}`;
+      const posInfo = POSITIONS[posCode] || { name: posCode, materialIcon: "sports_soccer" };
+      selectedPosDisplay.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px;">${posInfo.materialIcon || 'sports_soccer'}</span> ${posCode} - ${posInfo.name}`;
     }
   };
 
@@ -248,102 +248,135 @@ export function renderDashboard(player, currentYear = 2026) {
     tierBadge.className = `badge ${player.overall >= 85 ? 'badge-green' : player.overall >= 75 ? 'badge-gold' : 'badge-pos'}`;
   }
 
-  // Renderiza o Card Colecionável FUT (Ultimate Team Style)
+  // Renderiza o Match Career Card Oficial (Proporção 4:5 - Padrão Broadcast Stitch)
   if (futCardContainer) {
-    const cardFrame = AssetManager.getCardFrame(player.overall);
-    const tierClass = AssetManager.getCardTierClass(player.overall);
-    const archBadge = AssetManager.getArchetypeBadge(player.archetype);
-    const archBadgeHtml = archBadge ? `<div class="fut-card-archetype-badge" title="Arquétipo: ${player.archetype}"><img src="${archBadge}" alt="Arquétipo" /></div>` : '';
-    const clubCrestHtml = AssetManager.renderClubBadgeHtml(club, 24);
+    const clubCrestHtml = AssetManager.renderClubBadgeHtml(club, 22);
+    const posIcon = positionInfo.materialIcon || 'sports_soccer';
+    const archetypeObj = getArchetypeById(player.archetype) || { name: player.archetype };
 
     futCardContainer.innerHTML = `
-      <div class="fut-player-card ${tierClass}">
-        <img src="${cardFrame}" alt="Moldura do Card" class="fut-card-frame-bg" />
-        <div class="fut-card-inner">
-          <div class="fut-card-top">
-            <div class="fut-card-rating-block">
-              <span class="fut-card-ovr">${player.overall}</span>
-              <span class="fut-card-pos">${player.position}</span>
-            </div>
-            ${archBadgeHtml}
+      <div class="match-career-card" id="match-career-card">
+        <!-- Marca d'água técnica de campo de futebol -->
+        <svg class="match-career-watermark" viewBox="0 0 100 100" fill="none" stroke="#00FF87">
+          <circle cx="50" cy="50" r="45" stroke-width="1.5" />
+          <circle cx="50" cy="50" r="18" stroke-width="1.5" />
+          <line x1="5" y1="50" x2="95" y2="50" stroke-width="1.5" />
+        </svg>
+
+        <div class="career-card-header">
+          <div class="career-card-rating-block">
+            <span class="career-card-ovr">${player.overall}</span>
+            <span class="career-card-pos">${player.position}</span>
           </div>
+          <div class="career-card-archetype">
+            <span class="material-symbols-outlined" style="font-size: 13px;">shield</span>
+            <span>${archetypeObj.name || player.archetype}</span>
+          </div>
+        </div>
 
-          <div class="fut-card-avatar-area">
-            <div class="fut-card-avatar-circle">
-              ${positionInfo.icon}
+        <div class="career-card-visual-area">
+          <div class="career-card-avatar-box">
+            <span class="material-symbols-outlined">${posIcon}</span>
+          </div>
+          <div class="career-card-name-block">
+            <div class="career-card-name">${player.name}</div>
+            <div class="career-card-club-line">
+              ${clubCrestHtml}
+              <span>${club.shortName || club.name}</span>
             </div>
           </div>
+        </div>
 
-          <div class="fut-card-name">${player.name}</div>
-          ${player.nickname ? `<div class="fut-card-nickname">"${player.nickname}"</div>` : ''}
-
-          <div class="fut-card-club-row">
-            ${clubCrestHtml}
-            <span style="font-size: 0.8rem; font-weight: 800; color: var(--text-main);">${club.shortName || club.name}</span>
+        <div class="career-card-telemetry-grid">
+          <div class="career-mini-telemetry">
+            <span class="career-mini-val" style="color: var(--primary-container);">${player.physical}</span>
+            <span class="career-mini-lbl">FÍSICO</span>
           </div>
-
-          <div class="fut-card-stats-row">
-            <div class="fut-mini-stat">
-              <span class="fut-mini-stat-val" style="color: var(--accent-green);">${player.physical}</span>
-              <span class="fut-mini-stat-lbl">FÍSICO</span>
-            </div>
-            <div class="fut-mini-stat">
-              <span class="fut-mini-stat-val" style="color: var(--accent-blue);">${player.careerStats.totalGoals}</span>
-              <span class="fut-mini-stat-lbl">GOLS</span>
-            </div>
-            <div class="fut-mini-stat">
-              <span class="fut-mini-stat-val" style="color: var(--accent-gold);">${player.careerStats.trophies.length}</span>
-              <span class="fut-mini-stat-lbl">TÍTULOS</span>
-            </div>
+          <div class="career-mini-telemetry">
+            <span class="career-mini-val">${player.careerStats.totalGoals}</span>
+            <span class="career-mini-lbl">GOLS</span>
+          </div>
+          <div class="career-mini-telemetry">
+            <span class="career-mini-val" style="color: var(--secondary);">${player.careerStats.trophies.length}</span>
+            <span class="career-mini-lbl">TÍTULOS</span>
           </div>
         </div>
       </div>
     `;
   }
 
-  // Renderiza Grid de Chips de Estatísticas com Sprites 3D
+  // Renderiza Grid de Chips de Telemetria Tática
   if (statChipsGrid) {
-    const moraleColor = player.morale >= 70 ? 'var(--accent-green)' : player.morale <= 35 ? 'var(--accent-red)' : 'var(--accent-gold)';
+    const moraleColor = player.morale >= 70 ? 'var(--primary-container)' : player.morale <= 35 ? 'var(--card-red)' : 'var(--secondary)';
+    
+    let potentialStatus = "EM EXPANSÃO";
+    let potentialColor = "var(--primary-container)";
+    if (player.age >= 33) {
+      potentialStatus = "VETERANO";
+      potentialColor = "var(--text-muted)";
+    } else if (player.age >= 28) {
+      potentialStatus = "CONSOLIDADO";
+      potentialColor = "var(--secondary)";
+    }
+
     statChipsGrid.innerHTML = `
-      <div class="stat-chip-3d" title="Condição Física Atual">
-        <img src="${AssetManager.getUiIcon('physical')}" alt="Físico" class="stat-chip-icon-img" />
+      <div class="stat-chip-tactical" title="Condição Física e Resistência a Lesões">
+        <div class="stat-chip-icon-box">
+          <span class="material-symbols-outlined" style="color: var(--primary-container);">fitness_center</span>
+        </div>
         <div class="stat-chip-info">
-          <span class="stat-chip-value" style="color: var(--accent-green);">${player.physical}</span>
-          <span class="stat-chip-label">Condição Física</span>
+          <span class="stat-chip-value" style="color: var(--primary-container);">${player.physical}</span>
+          <span class="stat-chip-label">FÍSICO / STAMINA</span>
         </div>
       </div>
 
-      <div class="stat-chip-3d" title="Nível de Moral e Motivação">
-        <img src="${AssetManager.getUiIcon('morale')}" alt="Moral" class="stat-chip-icon-img" />
+      <div class="stat-chip-tactical" title="Nível de Moral e Motivação">
+        <div class="stat-chip-icon-box">
+          <span class="material-symbols-outlined" style="color: ${moraleColor};">psychology</span>
+        </div>
         <div class="stat-chip-info">
           <span class="stat-chip-value" style="color: ${moraleColor};">${player.morale}%</span>
-          <span class="stat-chip-label">Moral / Foco</span>
+          <span class="stat-chip-label">MORAL / FOCO</span>
         </div>
       </div>
 
-      <div class="stat-chip-3d" title="Reputação e Prestígio Nacional">
-        <img src="${AssetManager.getUiIcon('reputation')}" alt="Reputação" class="stat-chip-icon-img" />
+      <div class="stat-chip-tactical" title="Reputação e Prestígio no Circuito">
+        <div class="stat-chip-icon-box">
+          <span class="material-symbols-outlined" style="color: var(--secondary);">military_tech</span>
+        </div>
         <div class="stat-chip-info">
-          <span class="stat-chip-value" style="color: var(--accent-gold);">${player.reputation}</span>
-          <span class="stat-chip-label">Reputação / Fama</span>
+          <span class="stat-chip-value" style="color: var(--secondary);">${player.reputation}</span>
+          <span class="stat-chip-label">REPUTAÇÃO</span>
         </div>
       </div>
 
-      <div class="stat-chip-3d" title="Saldo Financeiro em Conta">
-        <img src="${AssetManager.getUiIcon('money')}" alt="Carteira" class="stat-chip-icon-img" />
+      <div class="stat-chip-tactical" title="Saldo Financeiro em Conta">
+        <div class="stat-chip-icon-box">
+          <span class="material-symbols-outlined" style="color: var(--secondary);">account_balance_wallet</span>
+        </div>
         <div class="stat-chip-info">
-          <span class="stat-chip-value" style="color: var(--accent-gold);">${formatMoney(player.finances)}</span>
-          <span class="stat-chip-label">Saldo Bancário</span>
+          <span class="stat-chip-value" style="color: var(--secondary);">${formatMoney(player.finances)}</span>
+          <span class="stat-chip-label">PATRIMÔNIO</span>
+        </div>
+      </div>
+
+      <div class="stat-chip-tactical" title="Projeção Evolutiva Atual">
+        <div class="stat-chip-icon-box">
+          <span class="material-symbols-outlined" style="color: ${potentialColor};">trending_up</span>
+        </div>
+        <div class="stat-chip-info">
+          <span class="stat-chip-value" style="color: ${potentialColor}; font-size: 0.82rem;">${potentialStatus}</span>
+          <span class="stat-chip-label">PROJEÇÃO</span>
         </div>
       </div>
     `;
   }
 
   if (tournamentBadge) {
-    tournamentBadge.textContent = `🏆 Temporada ${currentYear}`;
+    tournamentBadge.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;">emoji_events</span> TEMPORADA ${currentYear}`;
   }
   if (btnSimulate) {
-    btnSimulate.innerHTML = `⚽ Simular Temporada ${currentYear}`;
+    btnSimulate.innerHTML = `<span class="material-symbols-outlined">sports_soccer</span> SIMULAR TEMPORADA ${currentYear}`;
   }
 
   // Conecta o botão de Vida & Fortuna
@@ -789,111 +822,113 @@ export function renderEventView(event, onChoiceCallback) {
     const bannerUrl = AssetManager.getEventBanner(event.id);
     if (bannerUrl) {
       bannerContainer.innerHTML = `
-        <div class="event-hero-banner">
-          <img src="${bannerUrl}" alt="" class="event-hero-img" />
-          <div class="event-hero-overlay"></div>
-        </div>
+        <img src="${bannerUrl}" alt="${event.title}" class="event-banner-img" />
       `;
     } else {
       bannerContainer.innerHTML = '';
     }
   }
 
-  if (catEl) catEl.textContent = event.categoryName || "🎭 Dilema Futebolístico";
+  if (catEl) {
+    catEl.innerHTML = `<span class="material-symbols-outlined" style="font-size: 13px;">theater_comedy</span> ${event.categoryName || "DILEMA EXTRACAMPO"}`;
+  }
   if (titleEl) titleEl.textContent = event.title;
   if (descEl) descEl.textContent = event.description;
 
   if (choicesContainer) {
     choicesContainer.innerHTML = '';
     event.choices.forEach(choice => {
-      const choiceCard = document.createElement('div');
-      choiceCard.className = 'card-panel';
-      choiceCard.style.cssText = 'background: var(--bg-surface); border: 1px solid var(--border-medium); margin-bottom: 0.85rem; padding: 1.15rem; border-radius: var(--radius-sm);';
-
       // Monta badges de Ganhos Base
       const gainBadges = [];
       const baseGain = choice.baseGain || {};
-      if (baseGain.morale) gainBadges.push(`<span class="badge badge-green">+${baseGain.morale} Moral</span>`);
-      if (baseGain.reputation) gainBadges.push(`<span class="badge badge-gold">+${baseGain.reputation} Reputação</span>`);
-      if (baseGain.physical) gainBadges.push(`<span class="badge badge-green">+${baseGain.physical} Físico</span>`);
-      if (baseGain.overall) gainBadges.push(`<span class="badge badge-gold">+${baseGain.overall} Overall</span>`);
-      if (baseGain.money) gainBadges.push(`<span class="badge badge-gold">+${formatMoney(baseGain.money)}</span>`);
+      if (baseGain.morale) gainBadges.push(`<span class="choice-gain">+${baseGain.morale} Moral</span>`);
+      if (baseGain.reputation) gainBadges.push(`<span class="choice-gain">+${baseGain.reputation} Reputação</span>`);
+      if (baseGain.physical) gainBadges.push(`<span class="choice-gain">+${baseGain.physical} Físico</span>`);
+      if (baseGain.overall) gainBadges.push(`<span class="choice-gain">+${baseGain.overall} OVR</span>`);
+      if (baseGain.money) gainBadges.push(`<span class="choice-gain">+${formatMoney(baseGain.money)}</span>`);
 
       // Monta badges de Perdas Base
       const lossBadges = [];
       const baseLoss = choice.baseLoss || {};
-      if (baseLoss.morale) lossBadges.push(`<span class="badge badge-red">${baseLoss.morale} Moral</span>`);
-      if (baseLoss.reputation) lossBadges.push(`<span class="badge badge-red">${baseLoss.reputation} Reputação</span>`);
-      if (baseLoss.physical) lossBadges.push(`<span class="badge badge-red">${baseLoss.physical} Físico</span>`);
-      if (baseLoss.overall) lossBadges.push(`<span class="badge badge-red">${baseLoss.overall} Overall</span>`);
-      if (baseLoss.money) lossBadges.push(`<span class="badge badge-red">-${formatMoney(Math.abs(baseLoss.money))}</span>`);
+      if (baseLoss.morale) lossBadges.push(`<span class="choice-loss">-${Math.abs(baseLoss.morale)} Moral</span>`);
+      if (baseLoss.reputation) lossBadges.push(`<span class="choice-loss">-${Math.abs(baseLoss.reputation)} Reputação</span>`);
+      if (baseLoss.physical) lossBadges.push(`<span class="choice-loss">-${Math.abs(baseLoss.physical)} Físico</span>`);
+      if (baseLoss.overall) lossBadges.push(`<span class="choice-loss">-${Math.abs(baseLoss.overall)} OVR</span>`);
+      if (baseLoss.money) lossBadges.push(`<span class="choice-loss">-${formatMoney(Math.abs(baseLoss.money))}</span>`);
 
-      const gainsHtml = gainBadges.length > 0 ? `<div><small style="color: var(--accent-green); font-weight: 700;">Ganhos Base:</small> ${gainBadges.join(' ')}</div>` : '';
-      const lossesHtml = lossBadges.length > 0 ? `<div><small style="color: var(--accent-red); font-weight: 700;">Perdas Base:</small> ${lossBadges.join(' ')}</div>` : '';
+      const gainsHtml = gainBadges.length > 0 ? `<div><b>Ganhos Base:</b> ${gainBadges.join(' &bull; ')}</div>` : '';
+      const lossesHtml = lossBadges.length > 0 ? `<div><b>Perdas Base:</b> ${lossBadges.join(' &bull; ')}</div>` : '';
 
       // Se possui a mecânica de Sorteio (Gamble)
       if (choice.hasGamble && choice.gamble) {
+        const choiceCard = document.createElement('div');
+        choiceCard.className = 'choice-btn choice-gamble';
         choiceCard.innerHTML = `
-          <div style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.3rem;">
-            ${choice.text}
+          <div class="choice-header-row">
+            <span class="choice-label">${choice.text}</span>
+            <span class="choice-odds-badge gamble-badge">
+              <span class="material-symbols-outlined" style="font-size:12px; vertical-align: middle;">casino</span>
+              ${choice.gamble.gambleLabel || 'Sorteio Opcional'}
+            </span>
           </div>
-          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem; line-height: 1.5;">
+          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; line-height: 1.45;">
             ${choice.desc}
           </div>
-          
-          <div style="display: flex; flex-direction: column; gap: 0.35rem; background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: var(--radius-xs); margin-bottom: 0.85rem; border: 1px dashed var(--border-subtle);">
+          <div class="choice-outcomes" style="margin-bottom: 0.75rem;">
             ${gainsHtml}
             ${lossesHtml}
-            <div style="font-size: 0.8rem; color: var(--accent-gold); margin-top: 0.25rem;">
-              🎲 <b>Sorteio Opcional:</b> ${choice.gamble.gambleLabel}
-            </div>
           </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem;">
-            <button class="btn btn-guaranteed-styled btn-sm btn-choice-guaranteed" aria-label="Ir no garantido com certeza de resultado">
-              <img src="${AssetManager.getUiIcon('guaranteed')}" class="btn-action-icon" alt="" />
-              <span>Ir no Garantido</span>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; width: 100%;">
+            <button type="button" class="btn btn-secondary btn-sm btn-choice-guaranteed" style="border-color: rgba(0,255,135,0.4); color: var(--primary-container);">
+              <span class="material-symbols-outlined" style="font-size:14px;">shield</span> IR NO GARANTIDO
             </button>
-            <button class="btn btn-gamble-styled btn-sm btn-choice-gamble" aria-label="Arriscar no sorteio por ganhos maiores">
-              <img src="${AssetManager.getUiIcon('gamble')}" class="btn-action-icon" alt="" />
-              <span>Arriscar no Sorteio!</span>
+            <button type="button" class="btn btn-gold btn-sm btn-choice-gamble">
+              <span class="material-symbols-outlined" style="font-size:14px;">casino</span> ARRISCAR NO SORTEIO
             </button>
           </div>
         `;
 
-        choiceCard.querySelector('.btn-choice-guaranteed').onclick = () => {
+        choiceCard.querySelector('.btn-choice-guaranteed').onclick = (e) => {
+          e.stopPropagation();
           if (onChoiceCallback) onChoiceCallback(choice.id, 'guaranteed');
         };
-        choiceCard.querySelector('.btn-choice-gamble').onclick = () => {
+        choiceCard.querySelector('.btn-choice-gamble').onclick = (e) => {
+          e.stopPropagation();
           if (onChoiceCallback) onChoiceCallback(choice.id, 'gamble');
         };
+
+        choicesContainer.appendChild(choiceCard);
       } 
       // Escolha Padrão (Sem Sorteio)
       else {
+        const choiceCard = document.createElement('div');
+        choiceCard.className = 'choice-btn choice-guaranteed';
         choiceCard.innerHTML = `
-          <div style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.3rem;">
-            ${choice.text}
+          <div class="choice-header-row">
+            <span class="choice-label">${choice.text}</span>
+            <span class="choice-odds-badge guaranteed-badge">
+              <span class="material-symbols-outlined" style="font-size:12px; vertical-align: middle;">shield</span> GARANTIDO
+            </span>
           </div>
-          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem; line-height: 1.5;">
+          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; line-height: 1.45;">
             ${choice.desc}
           </div>
-
-          <div style="display: flex; flex-direction: column; gap: 0.35rem; background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: var(--radius-xs); margin-bottom: 0.85rem; border: 1px dashed var(--border-subtle);">
+          <div class="choice-outcomes" style="margin-bottom: 0.75rem;">
             ${gainsHtml}
             ${lossesHtml}
           </div>
-
-          <button class="btn btn-primary btn-block btn-sm btn-choice-standard" aria-label="Confirmar esta escolha">
-            ✔️ Escolher Esta Opção
+          <button type="button" class="btn btn-primary btn-block btn-sm btn-choice-standard">
+            CONFIRMAR DECISÃO
           </button>
         `;
 
-        choiceCard.querySelector('.btn-choice-standard').onclick = () => {
+        choiceCard.querySelector('.btn-choice-standard').onclick = (e) => {
+          e.stopPropagation();
           if (onChoiceCallback) onChoiceCallback(choice.id, 'guaranteed');
         };
-      }
 
-      choicesContainer.appendChild(choiceCard);
+        choicesContainer.appendChild(choiceCard);
+      }
     });
   }
 }
@@ -922,13 +957,13 @@ export function renderEventOutcome(outcomeResult, onContinueCallback) {
   if (changes.money) badges.push(`<span class="badge badge-gold">Finanças ${changes.money > 0 ? '+' : ''}R$ ${Math.abs(changes.money)}</span>`);
 
   const modeBadge = isGamble 
-    ? `<span class="badge badge-gold" style="margin-bottom: 0.5rem;">🎲 Resolução por Sorteio</span>`
-    : `<span class="badge badge-green" style="margin-bottom: 0.5rem;">🛡️ Resolução Garantida</span>`;
+    ? `<span class="badge badge-gold" style="margin-bottom: 0.5rem;"><span class="material-symbols-outlined" style="font-size:12px;">casino</span> Resolução por Sorteio</span>`
+    : `<span class="badge badge-green" style="margin-bottom: 0.5rem;"><span class="material-symbols-outlined" style="font-size:12px;">shield</span> Resolução Garantida</span>`;
 
   descEl.innerHTML = `
     ${modeBadge}
-    <div style="font-size: 1.25rem; font-weight: 900; color: ${isSuccess ? 'var(--accent-green)' : 'var(--accent-red)'}; margin-bottom: 0.65rem;">
-      ${outcomeResult.title || (isSuccess ? '✅ SUCESSO ESPORTIVO!' : '⚠️ COMPLICAÇÕES GRAVES!')}
+    <div style="font-size: 1.25rem; font-weight: 900; color: ${isSuccess ? 'var(--primary-container)' : 'var(--card-red)'}; margin-bottom: 0.65rem;">
+      ${outcomeResult.title || (isSuccess ? 'SUCESSO ESPORTIVO!' : 'COMPLICAÇÕES GRAVES!')}
     </div>
     <p style="margin-bottom: 1rem; color: var(--text-main); font-size: 0.95rem; line-height: 1.6;">${outcomeResult.text}</p>
     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
@@ -938,7 +973,7 @@ export function renderEventOutcome(outcomeResult, onContinueCallback) {
 
   choicesContainer.innerHTML = `
     <button id="btn-event-continue" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;">
-      ⚽ Prosseguir com a Temporada ➡️
+      <span class="material-symbols-outlined">play_arrow</span> PROSSEGUIR COM A TEMPORADA
     </button>
   `;
 
@@ -949,7 +984,6 @@ export function renderEventOutcome(outcomeResult, onContinueCallback) {
     };
   }
 }
-
 
 /**
  * Exibe a Janela de Transferências com propostas na mesa

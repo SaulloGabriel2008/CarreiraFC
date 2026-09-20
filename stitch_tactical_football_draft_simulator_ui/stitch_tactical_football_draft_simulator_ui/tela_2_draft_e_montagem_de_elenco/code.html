@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>COPERO 7x0 - Simulador Tático Eliminatório</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;700;800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; } .pitch-grid-bg { background-color: #0b1326; background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px); background-size: 32px 32px, 100% 64px; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-tint": "#00e478", "tertiary-fixed-dim": "#ffb3ad", "on-tertiary": "#68000a", "surface-container-low": "#131b2e", "primary": "#f1ffef", "on-surface": "#dae2fd", "inverse-on-surface": "#283044", "surface-dim": "#0b1326", "inverse-primary": "#006d36", "surface-container-lowest": "#060e20", "error": "#ffb4ab", "secondary-fixed": "#ffe083", "on-tertiary-fixed-variant": "#930013", "on-tertiary-container": "#bf1f27", "outline": "#849585", "on-secondary": "#3c2f00", "background": "#0b1326", "error-container": "#93000a", "surface-container-highest": "#2d3449", "primary-fixed": "#60ff98", "on-surface-variant": "#b9cbb9", "tertiary-fixed": "#ffdad7", "on-secondary-fixed-variant": "#574500", "surface-container-high": "#222a3d", "tertiary": "#fffaf9", "on-secondary-container": "#645000", "surface-bright": "#31394d", "surface-container": "#171f33", "secondary-fixed-dim": "#eec200", "on-primary-fixed-variant": "#005227", "secondary": "#ffe083", "outline-variant": "#3b4b3d", "tertiary-container": "#ffd5d1", "on-error": "#690005", "secondary-container": "#eec200", "surface": "#0b1326", "on-secondary-fixed": "#231b00", "on-background": "#dae2fd", "on-tertiary-fixed": "#410004", "on-error-container": "#ffdad6", "on-primary": "#003919", "on-primary-container": "#007138", "on-primary-fixed": "#00210c", "surface-variant": "#2d3449", "primary-container": "#00ff87", "inverse-surface": "#dae2fd", "primary-fixed-dim": "#00e478" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-xl": "2rem", "space-sm": "0.5rem", "gutter-tablet": "0.75rem", "margin": "2rem", "space-xs": "0.25rem", "space-md": "1rem", "gutter-mobile": "0.5rem", "margin-tablet": "1rem", "gutter": "1rem", "space-lg": "1.5rem", "margin-mobile": "0.75rem" }, "fontFamily": { "label-badge": ["Plus Jakarta Sans"], "telemetry-mono": ["JetBrains Mono"], "display-hero-mobile": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "metric-xl": ["JetBrains Mono"], "metric-md": ["JetBrains Mono"], "headline-xl": ["Plus Jakarta Sans"], "headline-xl-mobile": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"], "metric-lg": ["JetBrains Mono"], "headline-lg": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "display-hero": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"] }, "fontSize": { "label-badge": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "800" }], "telemetry-mono": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }], "display-hero-mobile": ["36px", { "lineHeight": "42px", "letterSpacing": "-0.02em", "fontWeight": "800" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "metric-xl": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.04em", "fontWeight": "700" }], "metric-md": ["15px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800" }], "headline-xl-mobile": ["26px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "metric-lg": ["22px", { "lineHeight": "26px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "headline-lg": ["24px", { "lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "headline-md": ["20px", { "lineHeight": "26px", "letterSpacing": "0em", "fontWeight": "700" }], "headline-sm": ["16px", { "lineHeight": "22px", "letterSpacing": "0.02em", "fontWeight": "700" }], "display-hero": ["56px", { "lineHeight": "64px", "letterSpacing": "-0.03em", "fontWeight": "800" }], "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }] } } } };</script></head><body class="bg-surface pitch-grid-bg font-body-md text-on-surface min-h-screen flex flex-col justify-between selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="h-20 max-w-[1200px] mx-auto px-margin flex items-center justify-between gap-gutter"><div class="flex items-center gap-space-md"><img alt="Copero 7x0 Tactical Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1V6ZEFZHn7tOHWrL-cUGzSqIO05lTSxENwZVLZz2sJPg6rZmUjNRqXclih1AiM0xUFhZtEKODOfvSlTSHDlkVBnHIe9htv7-zkp5KheDWSIqkaxvIA4F7TDT0-pTFuw99-T4BKnq-mwkVnWmoSmIWaBDTU01DRdEBfOEz68LAHG2bWkBgFO4Xy9WCID2-Ec5rBSd4PzMsprTEJo8Mnfe1aCkV7hjwnAh8IxUNWZ6VRkEIQEng2N9tWnTw"/><div class="flex flex-col"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm uppercase tracking-wider text-primary font-bold">Copero 7x0</span><span class="px-space-xs py-0.5 rounded bg-surface-container-high text-primary-fixed font-telemetry-mono text-telemetry-mono border border-surface-bright">TEMPORADA 2025 - V1.4.0</span></div><span class="font-telemetry-mono text-telemetry-mono text-on-surface-variant uppercase tracking-widest">Prancheta Tática · Eliminatória Sim</span></div></div><div class="hidden lg:flex items-center gap-space-sm bg-surface-container-low px-space-md py-space-xs rounded-lg"><div class="flex items-center gap-space-xs"><div class="w-3 h-3 rounded-full bg-[#10b981]"></div><div class="w-3 h-3 rounded-full bg-[#ffffff]"></div></div><div class="flex flex-col"><span class="font-headline-sm text-[12px] uppercase leading-none font-bold text-on-surface">Guaíba FC</span><span class="font-telemetry-mono text-[10px] uppercase text-on-surface-variant">Série Ouro · 4-3-3 Ofensivo</span></div><span class="ml-space-xs px-space-xs py-0.5 rounded bg-secondary-container/20 text-secondary font-label-badge text-label-badge uppercase">Quartas</span></div><nav class="hidden md:flex items-center gap-space-xs bg-surface-container-low p-1 rounded-xl" data-active-classes="bg-primary-container text-on-primary-container font-bold rounded-lg shadow-[0_0_12px_rgba(0,255,135,0.25)]"><a class="px-space-md py-space-xs rounded-lg font-headline-sm text-[13px] uppercase tracking-wide text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="identidade" href="#">Identidade</a><a aria-current="page" class="px-space-md py-space-xs uppercase tracking-wide transition-all bg-primary-container text-on-primary-container font-bold rounded-lg shadow-[0_0_12px_rgba(0,255,135,0.25)]" data-path="draft" href="#">Draft</a><a class="px-space-md py-space-xs rounded-lg font-headline-sm text-[13px] uppercase tracking-wide text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="pre-jogo" href="#">Pré-Jogo</a><a class="px-space-md py-space-xs rounded-lg font-headline-sm text-[13px] uppercase tracking-wide text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="partida" href="#">Partida</a><a class="px-space-md py-space-xs rounded-lg font-headline-sm text-[13px] uppercase tracking-wide text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="pos-jogo" href="#">Pós-Jogo</a></nav><div class="flex items-center gap-space-md"><div class="hidden sm:flex items-center gap-space-xs text-on-surface-variant font-telemetry-mono text-telemetry-mono bg-surface-container-low px-space-sm py-1 rounded"><span class="w-2 h-2 rounded-full bg-primary-fixed animate-pulse"></span><span>LIVE SYNC</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full max-w-[1200px] mx-auto px-margin pt-20 pb-space-xl flex-1"><div class="flex flex-col w-full gap-space-lg">
+<!-- TOP BAR DO DRAFT / TELEMETRIA GLOBAL -->
+<section class="w-full bg-surface-container-low rounded-xl p-space-md shadow-xl flex flex-col gap-space-md">
+<!-- Linha 1: Rodada & Teto Orçamentário -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="flex flex-col gap-space-xs min-w-0">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="px-space-xs py-0.5 rounded bg-primary-container/20 text-primary-container font-label-badge text-label-badge uppercase">Fase eliminatória</span>
+<span class="font-headline-sm text-headline-sm text-primary uppercase tracking-wide">Rodada de Escolha: 3 de 11 Titulares</span>
+<span class="font-telemetry-mono text-telemetry-mono text-on-surface-variant">| POSIÇÃO ATUAL: ARMADOR (MEI)</span>
+</div>
+<!-- Barra de Progresso do Draft -->
+<div class="w-full max-w-xl h-2 bg-surface-container-highest rounded-full overflow-hidden flex">
+<div class="bg-primary-container h-full w-[27%] transition-all duration-500 shadow-[0_0_8px_rgba(0,255,135,0.6)]"></div>
+</div>
+</div>
+<div class="flex items-center gap-space-md flex-wrap">
+<div class="flex flex-col items-start lg:items-end">
+<span class="font-telemetry-mono text-telemetry-mono text-on-surface-variant uppercase">Teto Orçamentário Restante</span>
+<div class="flex items-center gap-space-xs">
+<span class="font-metric-xl text-metric-xl text-primary font-bold tracking-tight">R$ 42.5M</span>
+<span class="px-space-xs py-0.5 rounded bg-surface-bright text-primary-fixed font-label-badge text-label-badge uppercase shadow-sm">Equilibrado</span>
+</div>
+</div>
+<div class="h-10 w-px bg-surface-bright hidden sm:block"></div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-telemetry-mono text-telemetry-mono">
+<span class="material-symbols-outlined text-[18px] text-secondary">verified_user</span>
+<span>CAP SALARIAL: 65.0M</span>
+</div>
+</div>
+</div>
+<!-- Linha 2: Medidores Gerais da Equipe em Tempo Real -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-space-md pt-space-xs">
+<!-- ATAQUE -->
+<div class="bg-surface-container p-space-sm rounded-lg flex flex-col gap-space-xs">
+<div class="flex items-center justify-between text-on-surface font-telemetry-mono text-telemetry-mono">
+<span class="flex items-center gap-1 font-bold">
+<span class="material-symbols-outlined text-[14px] text-primary-container">bolt</span> ATAQUE
+          </span>
+<span class="font-metric-md text-metric-md text-primary-container" id="stat-ataque">84<span class="text-on-surface-variant text-telemetry-mono font-normal">/99</span></span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container transition-all duration-500 shadow-[0_0_6px_rgba(0,255,135,0.7)]" style="width: 84.8%;"></div>
+</div>
+</div>
+<!-- MEIO-CAMPO -->
+<div class="bg-surface-container p-space-sm rounded-lg flex flex-col gap-space-xs">
+<div class="flex items-center justify-between text-on-surface font-telemetry-mono text-telemetry-mono">
+<span class="flex items-center gap-1 font-bold">
+<span class="material-symbols-outlined text-[14px] text-secondary">all_inclusive</span> MEIO-CAMPO
+          </span>
+<span class="font-metric-md text-metric-md text-secondary" id="stat-meio">81<span class="text-on-surface-variant text-telemetry-mono font-normal">/99</span></span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary transition-all duration-500 shadow-[0_0_6px_rgba(255,224,131,0.6)]" style="width: 81.8%;"></div>
+</div>
+</div>
+<!-- DEFESA -->
+<div class="bg-surface-container p-space-sm rounded-lg flex flex-col gap-space-xs">
+<div class="flex items-center justify-between text-on-surface font-telemetry-mono text-telemetry-mono">
+<span class="flex items-center gap-1 font-bold">
+<span class="material-symbols-outlined text-[14px] text-secondary-container">shield</span> DEFESA
+          </span>
+<span class="font-metric-md text-metric-md text-secondary-container" id="stat-defesa">78<span class="text-on-surface-variant text-telemetry-mono font-normal">/99</span></span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary-container transition-all duration-500 shadow-[0_0_6px_rgba(238,194,0,0.6)]" style="width: 78.7%;"></div>
+</div>
+</div>
+<!-- GOLEIRO -->
+<div class="bg-surface-container p-space-sm rounded-lg flex flex-col gap-space-xs">
+<div class="flex items-center justify-between text-on-surface font-telemetry-mono text-telemetry-mono">
+<span class="flex items-center gap-1 font-bold">
+<span class="material-symbols-outlined text-[14px] text-primary-fixed">sports_handball</span> GOLEIRO
+          </span>
+<span class="font-metric-md text-metric-md text-primary-fixed" id="stat-goleiro">86<span class="text-on-surface-variant text-telemetry-mono font-normal">/99</span></span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-fixed transition-all duration-500 shadow-[0_0_6px_rgba(96,255,152,0.6)]" style="width: 86.8%;"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- CORPO PRINCIPAL DO DRAFT: 3 CARDS DE JOGADORES + PRANCHETA TÁTICA DOS 11 -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-space-md items-start">
+<!-- ÁREA CENTRAL DE ESCOLHAS (CARDS DE JOGADORES) - 8 COLUNAS -->
+<div class="xl:col-span-8 flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary-container text-[22px]">swap_calls</span>
+<span class="font-headline-sm text-headline-sm text-primary uppercase">Candidatos Disponíveis · Vaga: MEI</span>
+</div>
+<span class="font-telemetry-mono text-telemetry-mono text-on-surface-variant">ANÁLISE BIOMÉTRICA &amp; SCOUT ATIVO</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+<!-- CARD 1: DESTAQUE OURO / MAESTRO -->
+<div class="player-card relative bg-surface-container rounded-xl p-space-md flex flex-col justify-between transition-all duration-300 shadow-xl ring-2 ring-primary-container shadow-[0_0_24px_rgba(0,255,135,0.2)] hover:-translate-y-1 cursor-pointer" id="card-player-1">
+<div class="absolute -top-3 right-4 px-2 py-0.5 rounded bg-secondary-container text-on-secondary font-label-badge text-label-badge uppercase shadow-md flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">star</span> ESTRELA ELITE
+          </div>
+<div class="flex flex-col gap-space-sm">
+<!-- Retrato + Badge OVR -->
+<div class="relative w-full h-44 rounded-lg overflow-hidden bg-surface-container-highest flex items-center justify-center">
+<img class="w-full h-full object-cover object-top filter contrast-125" data-alt="Dramatic close-up portrait of athletic 27 year old football playmaker Matheus Zanetti looking confident, dark ambient stadium locker room lighting with neon green rim light, high contrast sports cinematic photography, wearing an emerald green and white jersey" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJux9iYhlZSaZJGSXqz7_l8d9npF5vCH1pzwqlZXxQGkNKhjhQ8BvKjwZ6V2BIteoSzlyBu-Fo21fUkxrHMlnttT4CDYaTeiB3iHcwdSUEGjtTb-_h6PJwU_1y0_3zZ-8Zxy4UGQC3vR3n30cm0POPa65rTK1F1PbtEcNYn-NJa89GeKahCRUBkmdBKlOKgkimbNrEIKVVIOuP9acFu8q9ezxKy8BlYqXOLNPb9ocz5lAi5je2QZ9D"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent"></div>
+<!-- Badge Overall -->
+<div class="absolute bottom-2 left-2 flex items-center gap-1.5 bg-surface-container-lowest/90 px-2 py-1 rounded-lg backdrop-blur shadow-md">
+<span class="font-headline-sm text-headline-sm text-secondary-fixed font-bold">MEI</span>
+<div class="h-4 w-px bg-surface-bright"></div>
+<span class="font-metric-lg text-metric-lg text-secondary-fixed font-bold">88</span>
+</div>
+<!-- Salário Chip -->
+<div class="absolute bottom-2 right-2 bg-surface-container-lowest/90 px-2 py-1 rounded-lg backdrop-blur font-telemetry-mono text-telemetry-mono text-primary font-bold">
+                R$ 8.2M
+              </div>
+</div>
+<!-- Dados do Jogador -->
+<div class="flex flex-col">
+<span class="font-headline-md text-headline-md text-primary uppercase leading-tight font-bold">Matheus Zanetti</span>
+<span class="font-telemetry-mono text-telemetry-mono text-on-surface-variant">27 ANOS · DESTRO · 1.82M</span>
+</div>
+<!-- Traço Especial -->
+<div class="bg-surface-container-high p-space-xs rounded-lg flex items-start gap-1.5">
+<span class="material-symbols-outlined text-secondary-container text-[16px] shrink-0 mt-0.5">psychology</span>
+<div class="flex flex-col">
+<span class="font-label-badge text-[10px] text-secondary-container uppercase">Traço: Maestro do Mata-Mata</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant leading-tight">+10% precisão de passe sob pressão nos 15m finais.</span>
+</div>
+</div>
+<!-- Atributos Chave (Barras) -->
+<div class="flex flex-col gap-1.5 pt-1">
+<div class="flex items-center justify-between text-telemetry-mono font-telemetry-mono">
+<span class="text-on-surface-variant">PASSE</span>
+<span class="text-primary font-bold">92</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 92%;"></div>
+</div>
+<div class="flex items-center justify-between text-telemetry-mono font-telemetry-mono">
+<span class="text-on-surface-variant">VISÃO DE JOGO</span>
+<span class="text-primary font-bold">89</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 89%;"></div>
+</div>
+<div class="flex items-center justify-between text-telemetry-mono font-telemetry-mono">
+<span class="text-on-surface-variant">FÍSICO</span>
+<span class="text-on-surface-variant">74</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary" style="width: 74%;"></div>
+</div>
+</div>
+</div>
+<!-- Ação Escolher -->
+<div class="pt-space-md mt-space-xs">
+<button class="w-full py-space-sm px-space-md rounded-lg bg-primary-container text-on-primary-container font-headline-sm text-[12px] uppercase tracking-wider font-extrabold flex items-center justify-center gap-2 shadow-[0_0_16px_rgba(0,255,135,0.4)] hover:bg-primary-fixed transition-all" onclick="selectPlayer(1, 'Matheus Zanetti', 'MEI', 88, 'R$ 8.2M', 86, 88, 78, 86)">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+<span id="btn-label-1">CONTRATAR ATLETA [SELECIONADO]</span>
+</button>
+</div>
+</div>
+<!-- CARD 2: OPERÁRIO TÁTICO / LUCAS SILVA -->
+<div class="player-card relative bg-surface-container rounded-xl p-space-md flex flex-col justify-between transition-all duration-300 shadow-lg hover:-translate-y-1 cursor-pointer" id="card-player-2">
+<div class="flex flex-col gap-space-sm">
+<!-- Retrato + Badge OVR -->
+<div class="relative w-full h-44 rounded-lg overflow-hidden bg-surface-container-highest flex items-center justify-center">
+<img class="w-full h-full object-cover object-top filter contrast-110" data-alt="Intense sports portrait of 24 year old muscular midfielder Lucas Trator Silva with a tactical focused expression, high energy moody sports photography, deep shadow and yellow studio light accents, dark training apparel" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA46prvAyjb5feOaUCEFlHMKpBN4y5R8ziX730GolI1nniTSJywceLjQ0x9_qmpNwJzpjfYwHHeXoeBZ7FVXkWsxZbQz0ZUQ3MlcDoRswfnGAdXfF1KgjDd-Ls1rwVtNcLkGfBHaXDg2UT1kwrgGLEGgN5tkObnV1FRvnC7PtKunt-5EzsbXe2eHGPFXQxtymr85HeExlO2hkGkGp86v-5JYWN0TQEOlKrZeri0eNo-RyTgNcJPBd5z"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent"></div>
+<!-- Badge Overall -->
+<div class="absolute bottom-2 left-2 flex items-center gap-1.5 bg-surface-container-lowest/90 px-2 py-1 rounded-lg backdrop-blur shadow-md">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">VOL/MEI</span>
+<div class="h-4 w-px bg-surface-bright"></div>
+<span class="font-metric-lg text-metric-lg text-on-surface font-bold">82</span>
+</div>
+<!-- Salário Chip -->
+<div class="absolute bottom-2 right-2 bg-surface-container-lowest/90 px-2 py-1 rounded-lg backdrop-blur font-telemetry-mono text-telemetry-mono text-primary font-bold">
+                R$ 5.5M
+              </div>
+</div>
+<!-- Dados do Jogador -->
+<div class="flex flex-col">
+<span class="font-headline-md text-headline-md text-primary uppercase leading-tight font-bold">Lucas 'Trator' Silva</span>
+<span class="font-telemetry-mono text-telemetry-mono text-on-surface-variant">24 ANOS · AMBIDESTRO · 1.86M</span>
+</div>
+<!-- Traço Especial -->
+<div class="bg-surface-container-high p-space-xs rounded-lg flex items-start gap-1.5">
+<span class="material-symbols-outlined text-on-surface-variant text-[16px] shrink-0 mt-0.5">security</span>
+<div class="flex flex-col">
+<span class="font-label-badge text-[10px] text-on-surface-variant uppercase">Traço: Cão de Guarda</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant leading-tight">Ganho de 65% em divididas na intermediária defensiva.</span>
+</div>
+</div>
+<!-- Atributos Chave (Barras) -->
+<div class="flex flex-col gap-1.5 pt-1">
+<div class="flex items-center justify-between text-telemetry-mono font-telemetry-mono">
+<span class="text-on-surface-variant">PASSE</span>
+<span class="text-on-surface">81</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary" style="width: 81%;"></div>
+</div>
+<div class="flex items-center justify-between text-telemetry-mono font-telemetry-mono">
+<span class="text-on-surface-variant">DESARME</span>
+<span class="text-primary font-bold">88</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 88%;"></div>
+</div>
+<div class="flex items-center justify-between text-telemetry-mono font-telemetry-mono">
+<span class="text-on-surface-variant">FÍSICO</span>
+<span class="text-primary font-bold">91</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 91%;"></div>
+</div>
+</div>
+</div>
+<!-- Ação Escolher -->
+<div class="pt-space-md mt-space-xs">
+<button class="w-full py-space-sm px-space-md rounded-lg bg-surface-container-highest text-on-surface font-headline-sm text-[12px] uppercase tracking-wider font-extrabold flex items-center justify-center gap-2 hover:bg-surface-bright transition-all" onclick="selectPlayer(2, 'Lucas Silva', 'VOL/MEI', 82, 'R$ 5.5M', 82, 84, 82, 86)">
+<span class="material-symbols-outlined text-[18px]">add_circle_outline</span>
+<span id="btn-label-2">CONTRATAR ATLETA</span>
+</button>
+</div>
+</div>
+<!-- CARD 3: PROMESSA EXPLOSIVA / DIEGO KAUÃ -->
+<div class="player-card relative bg-surface-container rounded-xl p-space-md flex flex-col justify-between transition-all duration-300 shadow-lg hover:-translate-y-1 cursor-pointer" id="card-player-3">
+<div class="flex flex-col gap-space-sm">
+<!-- Retrato + Badge OVR -->
+<div class="relative w-full h-44 rounded-lg overflow-hidden bg-surface-container-highest flex items-center justify-center">
+<img class="w-full h-full object-cover object-top filter contrast-110" data-alt="Portrait of young Brazilian 19 year old athletic football talent Diego Kaua, dynamic lighting with subtle lens flare, modern broadcast sports aesthetic, confident grin, high detailed digital sports photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzGuVcz6fxqsVD7e7Epz0lE33nep_J4ORy-0nYwNdGenIRR7W637WFn0dHP6-_6LUiEEfL7VHro373CVUOFkQmzkozQw2s47fySCsuk4Vc_LfJQP-d3wpChWzBO_kyp1ENK5SWsO6ccqvRM-phzxnZ5ztEbrhqZTGrYw5ojLqiXKyAeuvw8pUUjL_Dr5Eav0Y1h5nbbWdoK-QSFuUJtavwhhwdV9SOPRWZds4QEZgjgSB42nxwiM-3"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent"></div>
+<!-- Badge Overall -->
+<div class="absolute bottom-2 left-2 flex items-center gap-1.5 bg-surface-container-lowest/90 px-2 py-1 rounded-lg backdrop-blur shadow-md">
+<span class="font-headline-sm text-headline-sm text-secondary-container font-bold">MEI/ATA</span>
+<div class="h-4 w-px bg-surface-bright"></div>
+<span class="font-metric-lg text-metric-lg text-secondary-container font-bold">79</span>
+</div>
+<!-- Salário Chip -->
+<div class="absolute bottom-2 right-2 bg-surface-container-lowest/90 px-2 py-1 rounded-lg backdrop-blur font-telemetry-mono text-telemetry-mono text-primary font-bold">
+                R$ 3.8M
+              </div>
+</div>
+<!-- Dados do Jogador -->
+<div class="flex flex-col">
+<span class="font-headline-md text-headline-md text-primary uppercase leading-tight font-bold">Diego Kauã</span>
+<span class="font-telemetry-mono text-telemetry-mono text-on-surface-variant">19 ANOS · CANHOTO · 1.75M</span>
+</div>
+<!-- Traço Especial -->
+<div class="bg-surface-container-high p-space-xs rounded-lg flex items-start gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[16px] shrink-0 mt-0.5">electric_bolt</span>
+<div class="flex flex-col">
+<span class="font-label-badge text-[10px] text-secondary uppercase">Traço: Driblador Veloz</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant leading-tight">Explosão em contra-ataques (+15km/h no drible longo).</span>
+</div>
+</div>
+<!-- Atributos Chave (Barras) -->
+<div class="flex flex-col gap-1.5 pt-1">
+<div class="flex items-center justify-between text-telemetry-mono font-telemetry-mono">
+<span class="text-on-surface-variant">FINALIZAÇÃO</span>
+<span class="text-primary font-bold">84</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 84%;"></div>
+</div>
+<div class="flex items-center justify-between text-telemetry-mono font-telemetry-mono">
+<span class="text-on-surface-variant">VELOCIDADE</span>
+<span class="text-primary font-bold">90</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 90%;"></div>
+</div>
+<div class="flex items-center justify-between text-telemetry-mono font-telemetry-mono">
+<span class="text-on-surface-variant">PASSE</span>
+<span class="text-on-surface-variant">76</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary" style="width: 76%;"></div>
+</div>
+</div>
+</div>
+<!-- Ação Escolher -->
+<div class="pt-space-md mt-space-xs">
+<button class="w-full py-space-sm px-space-md rounded-lg bg-surface-container-highest text-on-surface font-headline-sm text-[12px] uppercase tracking-wider font-extrabold flex items-center justify-center gap-2 hover:bg-surface-bright transition-all" onclick="selectPlayer(3, 'Diego Kauã', 'MEI/ATA', 79, 'R$ 3.8M', 87, 79, 76, 86)">
+<span class="material-symbols-outlined text-[18px]">add_circle_outline</span>
+<span id="btn-label-3">CONTRATAR ATLETA</span>
+</button>
+</div>
+</div>
+</div>
+<!-- PAINEL COMPARATIVO DE SCOUT RÁPIDO -->
+<div class="w-full bg-surface-container-low rounded-xl p-space-md flex flex-col md:flex-row items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-primary uppercase font-bold">Impacto Tático na Formação 4-3-3</span>
+<span class="font-telemetry-mono text-telemetry-mono text-on-surface-variant">Contratar Matheus Zanetti maximiza a taxa de retenção de posse nos mata-matas.</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs font-telemetry-mono text-telemetry-mono bg-surface-container px-space-sm py-1 rounded-lg">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span class="text-primary font-bold">SINERGIA: 94%</span>
+</div>
+</div>
+</div>
+<!-- PAINEL LATERAL: PRANCHETA DOS 11 TITULARES (CAMPO TÁTICO VERTICAL) - 4 COLUNAS -->
+<div class="xl:col-span-4 bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-md shadow-2xl">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">developer_board</span>
+<span class="font-headline-sm text-headline-sm text-primary uppercase font-bold">Prancheta dos 11</span>
+</div>
+<span class="px-space-xs py-0.5 rounded bg-surface-container-high font-label-badge text-label-badge text-on-surface uppercase">4-3-3 COPERO</span>
+</div>
+<!-- CAMPO TÁTICO ESTILIZADO -->
+<div class="relative w-full bg-surface-container-lowest rounded-xl p-space-sm flex flex-col justify-between overflow-hidden shadow-inner min-h-[480px]">
+<!-- Marcações do Gramado Tático (Inline SVG Linhas) -->
+<div class="absolute inset-0 pointer-events-none opacity-20 flex flex-col justify-between p-4">
+<div class="w-full h-16 border-b border-primary/40 flex justify-center">
+<div class="w-28 h-full border-x border-b border-primary/40"></div>
+</div>
+<div class="w-full flex items-center justify-center">
+<div class="w-24 h-24 rounded-full border border-primary/40 flex items-center justify-center">
+<div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
+</div>
+</div>
+<div class="w-full h-16 border-t border-primary/40 flex justify-center items-end">
+<div class="w-28 h-full border-x border-t border-primary/40"></div>
+</div>
+</div>
+<!-- SETOR 1: ATAQUE (3 SLOTS) -->
+<div class="relative z-10 grid grid-cols-3 gap-space-xs pt-1">
+<!-- Slot PE (Vago) -->
+<div class="h-16 rounded-lg bg-surface-container/60 border-dashed border-2 border-surface-bright flex flex-col items-center justify-center p-1 text-center">
+<span class="font-telemetry-mono text-[10px] text-on-surface-variant font-bold">PE</span>
+<span class="font-label-badge text-[9px] text-outline uppercase">Vago (R4)</span>
+</div>
+<!-- Slot CA (Vago) -->
+<div class="h-16 rounded-lg bg-surface-container/60 border-dashed border-2 border-surface-bright flex flex-col items-center justify-center p-1 text-center">
+<span class="font-telemetry-mono text-[10px] text-on-surface-variant font-bold">CA</span>
+<span class="font-label-badge text-[9px] text-outline uppercase">Vago (R5)</span>
+</div>
+<!-- Slot PD (Vago) -->
+<div class="h-16 rounded-lg bg-surface-container/60 border-dashed border-2 border-surface-bright flex flex-col items-center justify-center p-1 text-center">
+<span class="font-telemetry-mono text-[10px] text-on-surface-variant font-bold">PD</span>
+<span class="font-label-badge text-[9px] text-outline uppercase">Vago (R6)</span>
+</div>
+</div>
+<!-- SETOR 2: MEIO-CAMPO (3 SLOTS) - SLOT ATUAL EM BRILHO PULSANTE -->
+<div class="relative z-10 grid grid-cols-3 gap-space-xs my-auto py-2">
+<!-- Slot MC Esq (Vago) -->
+<div class="h-16 rounded-lg bg-surface-container/60 border-dashed border-2 border-surface-bright flex flex-col items-center justify-center p-1 text-center">
+<span class="font-telemetry-mono text-[10px] text-on-surface-variant font-bold">MC</span>
+<span class="font-label-badge text-[9px] text-outline uppercase">Vago (R7)</span>
+</div>
+<!-- SLOT ATUAL: MEI ARMADOR (PREENCHIDO COM O SELECIONADO ATUAL) -->
+<div class="h-16 rounded-lg bg-primary-container/10 border-2 border-primary-container flex flex-col items-center justify-center p-1 text-center shadow-[0_0_16px_rgba(0,255,135,0.4)] animate-pulse" id="pitch-slot-current">
+<div class="flex items-center gap-1">
+<span class="font-label-badge text-[9px] px-1 rounded bg-primary-container text-on-primary-container font-extrabold">MEI</span>
+<span class="font-telemetry-mono text-[11px] text-primary-container font-bold" id="pitch-slot-ovr">88</span>
+</div>
+<span class="font-headline-sm text-[11px] text-primary font-bold truncate max-w-full leading-tight" id="pitch-slot-name">M. Zanetti</span>
+<span class="font-telemetry-mono text-[9px] text-on-surface-variant font-medium">ESCOLHA ATUAL</span>
+</div>
+<!-- Slot VOL (Vago) -->
+<div class="h-16 rounded-lg bg-surface-container/60 border-dashed border-2 border-surface-bright flex flex-col items-center justify-center p-1 text-center">
+<span class="font-telemetry-mono text-[10px] text-on-surface-variant font-bold">VOL</span>
+<span class="font-label-badge text-[9px] text-outline uppercase">Vago (R8)</span>
+</div>
+</div>
+<!-- SETOR 3: DEFESA (4 SLOTS) - MURILO PREENCHIDO (ZAG) -->
+<div class="relative z-10 grid grid-cols-4 gap-space-xs">
+<!-- Slot LE -->
+<div class="h-14 rounded-lg bg-surface-container/60 border-dashed border-2 border-surface-bright flex flex-col items-center justify-center p-1 text-center">
+<span class="font-telemetry-mono text-[9px] text-on-surface-variant font-bold">LE</span>
+<span class="font-label-badge text-[8px] text-outline uppercase">R9</span>
+</div>
+<!-- Slot ZAG 1 (Já Escolhido: Murilo 80) -->
+<div class="h-14 rounded-lg bg-surface-container-high px-1 flex flex-col items-center justify-center text-center shadow-md">
+<div class="flex items-center gap-0.5">
+<span class="font-label-badge text-[8px] text-secondary-container font-bold">ZAG</span>
+<span class="font-telemetry-mono text-[10px] text-primary font-bold">80</span>
+</div>
+<span class="font-headline-sm text-[10px] text-on-surface font-bold truncate leading-none">Murilo</span>
+<span class="material-symbols-outlined text-[10px] text-primary-fixed mt-0.5">check</span>
+</div>
+<!-- Slot ZAG 2 -->
+<div class="h-14 rounded-lg bg-surface-container/60 border-dashed border-2 border-surface-bright flex flex-col items-center justify-center p-1 text-center">
+<span class="font-telemetry-mono text-[9px] text-on-surface-variant font-bold">ZAG</span>
+<span class="font-label-badge text-[8px] text-outline uppercase">R10</span>
+</div>
+<!-- Slot LD -->
+<div class="h-14 rounded-lg bg-surface-container/60 border-dashed border-2 border-surface-bright flex flex-col items-center justify-center p-1 text-center">
+<span class="font-telemetry-mono text-[9px] text-on-surface-variant font-bold">LD</span>
+<span class="font-label-badge text-[8px] text-outline uppercase">R11</span>
+</div>
+</div>
+<!-- SETOR 4: GOLEIRO (1 SLOT) - ALISSON PREENCHIDO (GK 86) -->
+<div class="relative z-10 flex justify-center pb-1 pt-1">
+<div class="w-36 h-14 rounded-lg bg-surface-container-high px-2 flex flex-col items-center justify-center text-center shadow-md">
+<div class="flex items-center gap-1">
+<span class="font-label-badge text-[9px] px-1 rounded bg-secondary-container/30 text-secondary-container font-bold">GK</span>
+<span class="font-telemetry-mono text-[11px] text-primary font-bold">86</span>
+<span class="material-symbols-outlined text-[12px] text-primary-fixed">verified</span>
+</div>
+<span class="font-headline-sm text-[11px] text-on-surface font-bold truncate leading-none">Alisson Becker</span>
+</div>
+</div>
+</div>
+<!-- Resumo Rápido do Elenco -->
+<div class="bg-surface-container p-space-sm rounded-lg flex items-center justify-between text-telemetry-mono font-telemetry-mono">
+<div class="flex items-center gap-space-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-primary-fixed">group</span>
+<span>QUOTA PREENCHIDA:</span>
+</div>
+<span class="text-primary font-bold">3 / 11 JOGADORES</span>
+</div>
+</div>
+</div>
+<!-- BARRA DE AÇÃO INFERIOR FIXA / RODAPÉ DE CONFIRMAÇÃO DO DRAFT -->
+<section class="w-full bg-surface-container-lowest rounded-xl p-space-md shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-space-md">
+<!-- Re-rolar e Estatística de Recursos -->
+<div class="flex items-center gap-space-md w-full sm:w-auto justify-between sm:justify-start">
+<button class="px-space-md py-space-sm rounded-lg bg-surface-container-high hover:bg-surface-bright text-on-surface font-headline-sm text-[12px] uppercase tracking-wider flex items-center gap-2 transition-all active:scale-95 shadow-md" onclick="rerollDraft()">
+<span class="material-symbols-outlined text-[18px] text-secondary">cached</span>
+<span>Re-rolar Opções (1/2 restantes)</span>
+</button>
+<span class="hidden md:inline font-telemetry-mono text-telemetry-mono text-on-surface-variant">
+        CUSTO DE RE-ROLL: <strong class="text-primary">GRÁTIS</strong>
+</span>
+</div>
+<!-- Ação Primária Luminosa -->
+<div class="flex items-center gap-space-md w-full sm:w-auto justify-end">
+<button class="w-full sm:w-auto px-space-lg py-space-md rounded-xl bg-primary-container hover:bg-primary-fixed text-on-primary-container font-headline-sm text-headline-sm uppercase font-extrabold tracking-wide flex items-center justify-center gap-space-sm shadow-[0_0_24px_rgba(0,255,135,0.4)] hover:shadow-[0_0_32px_rgba(0,255,135,0.6)] transition-all active:scale-98" onclick="confirmSquadStep()">
+<span>Confirmar Escolha e Avançar Rodada →</span>
+</button>
+</div>
+</section>
+</div>
+<!-- INTERAÇÕES CLIENT-SIDE NATIVAS -->
+<script>
+  let currentSelected = 1;
+  const playerData = {
+    1: { name: 'Matheus Zanetti', short: 'M. Zanetti', role: 'MEI', ovr: 88, salary: 'R$ 8.2M', atk: 84, mid: 88, def: 78, gk: 86 },
+    2: { name: "Lucas 'Trator' Silva", short: 'Lucas Silva', role: 'VOL/MEI', ovr: 82, salary: 'R$ 5.5M', atk: 82, mid: 84, def: 82, gk: 86 },
+    3: { name: 'Diego Kauã', short: 'Diego Kauã', role: 'MEI/ATA', ovr: 79, salary: 'R$ 3.8M', atk: 87, mid: 79, def: 76, gk: 86 }
+  };
+
+  function selectPlayer(id, name, role, ovr, salary, atk, mid, def, gk) {
+    currentSelected = id;
+
+    // Reset cards styles
+    [1, 2, 3].forEach(i => {
+      const card = document.getElementById('card-player-' + i);
+      const btn = card.querySelector('button');
+      const label = document.getElementById('btn-label-' + i);
+
+      if (i === id) {
+        card.classList.add('ring-2', 'ring-primary-container', 'shadow-[0_0_24px_rgba(0,255,135,0.2)]');
+        btn.className = 'w-full py-space-sm px-space-md rounded-lg bg-primary-container text-on-primary-container font-headline-sm text-[12px] uppercase tracking-wider font-extrabold flex items-center justify-center gap-2 shadow-[0_0_16px_rgba(0,255,135,0.4)] hover:bg-primary-fixed transition-all';
+        label.innerText = 'CONTRATAR ATLETA [SELECIONADO]';
+      } else {
+        card.classList.remove('ring-2', 'ring-primary-container', 'shadow-[0_0_24px_rgba(0,255,135,0.2)]');
+        btn.className = 'w-full py-space-sm px-space-md rounded-lg bg-surface-container-highest text-on-surface font-headline-sm text-[12px] uppercase tracking-wider font-extrabold flex items-center justify-center gap-2 hover:bg-surface-bright transition-all';
+        label.innerText = 'CONTRATAR ATLETA';
+      }
+    });
+
+    // Atualiza Prancheta Slot MEI
+    const pData = playerData[id];
+    document.getElementById('pitch-slot-ovr').innerText = pData.ovr;
+    document.getElementById('pitch-slot-name').innerText = pData.short;
+
+    // Atualiza Telemetria Superior com animação rápida
+    document.getElementById('stat-ataque').innerHTML = atk + '<span class="text-on-surface-variant text-telemetry-mono font-normal">/99</span>';
+    document.getElementById('stat-meio').innerHTML = mid + '<span class="text-on-surface-variant text-telemetry-mono font-normal">/99</span>';
+    document.getElementById('stat-defesa').innerHTML = def + '<span class="text-on-surface-variant text-telemetry-mono font-normal">/99</span>';
+    document.getElementById('stat-goleiro').innerHTML = gk + '<span class="text-on-surface-variant text-telemetry-mono font-normal">/99</span>';
+  }
+
+  function rerollDraft() {
+    alert('Girando scout de armadores... Novas cartas geradas do radar tático.');
+  }
+
+  function confirmSquadStep() {
+    const selected = playerData[currentSelected];
+    alert('Atleta ' + selected.name + ' (' + selected.role + ' - OVR ' + selected.ovr + ') contratado com sucesso para a Copa! Avançando para a Rodada 4 (Ponta Esquerda)...');
+  }
+</script></main><footer class="w-full bg-surface-container-lowest/90 backdrop-blur-md"><div class="max-w-[1200px] mx-auto px-margin py-space-sm flex flex-col md:flex-row items-center justify-between gap-space-sm text-on-surface-variant font-telemetry-mono text-telemetry-mono"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs"><span>ATALHOS:</span><kbd class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface">SPACE</kbd><span>Pausa/Play</span><kbd class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface">T</kbd><span>Táticas Rápidas</span><kbd class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface">ESC</kbd><span>Quadro Geral</span></div></div><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-xs cursor-pointer hover:text-on-surface transition-colors"><span class="material-symbols-outlined text-[16px]">volume_up</span><span>ÁUDIO CAMPO: ON</span></div><div class="flex items-center gap-space-xs text-outline"><span class="w-1.5 h-1.5 rounded-full bg-outline"></span><span>MATA-MATA SEM VOLTA</span></div></div></div></footer></body></html>

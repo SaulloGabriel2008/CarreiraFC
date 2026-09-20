@@ -73,9 +73,8 @@ export function showToast(message, type = 'success', durationMs = 3500) {
   const container = document.getElementById('toast-container');
   if (!container) return;
 
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
-  toast.innerHTML = `<span>${type === 'gold' ? '🏆' : type === 'danger' ? '⚠️' : '⚽'}</span> <span>${message}</span>`;
+  const iconName = type === 'gold' ? 'military_tech' : type === 'danger' ? 'warning' : 'sports_soccer';
+  toast.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px;">${iconName}</span> <span>${message}</span>`;
 
   container.appendChild(toast);
 
@@ -314,8 +313,13 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnSound) {
     btnSound.addEventListener('click', () => {
       gameState.isAudioEnabled = !gameState.isAudioEnabled;
-      btnSound.textContent = gameState.isAudioEnabled ? '🔊' : '🔇';
-      showToast(gameState.isAudioEnabled ? 'Efeitos ativados' : 'Efeitos silenciados', 'gold', 1500);
+      const soundIcon = document.getElementById('sound-icon');
+      if (soundIcon) {
+        soundIcon.textContent = gameState.isAudioEnabled ? 'volume_up' : 'volume_off';
+      } else {
+        btnSound.innerHTML = `<span class="material-symbols-outlined">${gameState.isAudioEnabled ? 'volume_up' : 'volume_off'}</span>`;
+      }
+      showToast(gameState.isAudioEnabled ? 'Efeitos sonoros ativados' : 'Efeitos silenciados', 'gold', 1500);
     });
   }
 

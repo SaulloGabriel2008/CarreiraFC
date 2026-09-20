@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>COPERO 7x0 - Simulador Tático Eliminatório</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;700;800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; } .pitch-grid-bg { background-color: #0b1326; background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px); background-size: 32px 32px, 100% 64px; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-tint": "#00e478", "tertiary-fixed-dim": "#ffb3ad", "on-tertiary": "#68000a", "surface-container-low": "#131b2e", "primary": "#f1ffef", "on-surface": "#dae2fd", "inverse-on-surface": "#283044", "surface-dim": "#0b1326", "inverse-primary": "#006d36", "surface-container-lowest": "#060e20", "error": "#ffb4ab", "secondary-fixed": "#ffe083", "on-tertiary-fixed-variant": "#930013", "on-tertiary-container": "#bf1f27", "outline": "#849585", "on-secondary": "#3c2f00", "background": "#0b1326", "error-container": "#93000a", "surface-container-highest": "#2d3449", "primary-fixed": "#60ff98", "on-surface-variant": "#b9cbb9", "tertiary-fixed": "#ffdad7", "on-secondary-fixed-variant": "#574500", "surface-container-high": "#222a3d", "tertiary": "#fffaf9", "on-secondary-container": "#645000", "surface-bright": "#31394d", "surface-container": "#171f33", "secondary-fixed-dim": "#eec200", "on-primary-fixed-variant": "#005227", "secondary": "#ffe083", "outline-variant": "#3b4b3d", "tertiary-container": "#ffd5d1", "on-error": "#690005", "secondary-container": "#eec200", "surface": "#0b1326", "on-secondary-fixed": "#231b00", "on-background": "#dae2fd", "on-tertiary-fixed": "#410004", "on-error-container": "#ffdad6", "on-primary": "#003919", "on-primary-container": "#007138", "on-primary-fixed": "#00210c", "surface-variant": "#2d3449", "primary-container": "#00ff87", "inverse-surface": "#dae2fd", "primary-fixed-dim": "#00e478" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-xl": "2rem", "space-sm": "0.5rem", "gutter-tablet": "0.75rem", "margin": "2rem", "space-xs": "0.25rem", "space-md": "1rem", "gutter-mobile": "0.5rem", "margin-tablet": "1rem", "gutter": "1rem", "space-lg": "1.5rem", "margin-mobile": "0.75rem" }, "fontFamily": { "label-badge": ["Plus Jakarta Sans"], "telemetry-mono": ["JetBrains Mono"], "display-hero-mobile": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "metric-xl": ["JetBrains Mono"], "metric-md": ["JetBrains Mono"], "headline-xl": ["Plus Jakarta Sans"], "headline-xl-mobile": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"], "metric-lg": ["JetBrains Mono"], "headline-lg": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "display-hero": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"] }, "fontSize": { "label-badge": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "800" }], "telemetry-mono": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }], "display-hero-mobile": ["36px", { "lineHeight": "42px", "letterSpacing": "-0.02em", "fontWeight": "800" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "metric-xl": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.04em", "fontWeight": "700" }], "metric-md": ["15px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800" }], "headline-xl-mobile": ["26px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "metric-lg": ["22px", { "lineHeight": "26px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "headline-lg": ["24px", { "lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "headline-md": ["20px", { "lineHeight": "26px", "letterSpacing": "0em", "fontWeight": "700" }], "headline-sm": ["16px", { "lineHeight": "22px", "letterSpacing": "0.02em", "fontWeight": "700" }], "display-hero": ["56px", { "lineHeight": "64px", "letterSpacing": "-0.03em", "fontWeight": "800" }], "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }] } } } };</script></head><body class="bg-surface pitch-grid-bg font-body-md text-on-surface min-h-screen flex flex-col justify-between selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="h-20 max-w-[1200px] mx-auto px-margin flex items-center justify-between gap-gutter"><div class="flex items-center gap-space-md"><img alt="Copero 7x0 Tactical Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1V6ZEFZHn7tOHWrL-cUGzSqIO05lTSxENwZVLZz2sJPg6rZmUjNRqXclih1AiM0xUFhZtEKODOfvSlTSHDlkVBnHIe9htv7-zkp5KheDWSIqkaxvIA4F7TDT0-pTFuw99-T4BKnq-mwkVnWmoSmIWaBDTU01DRdEBfOEz68LAHG2bWkBgFO4Xy9WCID2-Ec5rBSd4PzMsprTEJo8Mnfe1aCkV7hjwnAh8IxUNWZ6VRkEIQEng2N9tWnTw"/><div class="flex flex-col"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm uppercase tracking-wider text-primary font-bold">Copero 7x0</span><span class="px-space-xs py-0.5 rounded bg-surface-container-high text-primary-fixed font-telemetry-mono text-telemetry-mono border border-surface-bright">TEMPORADA 2025 - V1.4.0</span></div><span class="font-telemetry-mono text-telemetry-mono text-on-surface-variant uppercase tracking-widest">Prancheta Tática · Eliminatória Sim</span></div></div><div class="hidden lg:flex items-center gap-space-sm bg-surface-container-low px-space-md py-space-xs rounded-lg"><div class="flex items-center gap-space-xs"><div class="w-3 h-3 rounded-full bg-[#10b981]"></div><div class="w-3 h-3 rounded-full bg-[#ffffff]"></div></div><div class="flex flex-col"><span class="font-headline-sm text-[12px] uppercase leading-none font-bold text-on-surface">Guaíba FC</span><span class="font-telemetry-mono text-[10px] uppercase text-on-surface-variant">Série Ouro · 4-3-3 Ofensivo</span></div><span class="ml-space-xs px-space-xs py-0.5 rounded bg-secondary-container/20 text-secondary font-label-badge text-label-badge uppercase">Quartas</span></div><nav class="hidden md:flex items-center gap-space-xs bg-surface-container-low p-1 rounded-xl" data-active-classes="bg-primary-container text-on-primary-container font-bold rounded-lg shadow-[0_0_12px_rgba(0,255,135,0.25)]"><a aria-current="page" class="px-space-md py-space-xs uppercase tracking-wide transition-all bg-primary-container text-on-primary-container font-bold rounded-lg shadow-[0_0_12px_rgba(0,255,135,0.25)]" data-path="identidade" href="#">Identidade</a><a class="px-space-md py-space-xs rounded-lg font-headline-sm text-[13px] uppercase tracking-wide text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="draft" href="#">Draft</a><a class="px-space-md py-space-xs rounded-lg font-headline-sm text-[13px] uppercase tracking-wide text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="pre-jogo" href="#">Pré-Jogo</a><a class="px-space-md py-space-xs rounded-lg font-headline-sm text-[13px] uppercase tracking-wide text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="partida" href="#">Partida</a><a class="px-space-md py-space-xs rounded-lg font-headline-sm text-[13px] uppercase tracking-wide text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="pos-jogo" href="#">Pós-Jogo</a></nav><div class="flex items-center gap-space-md"><div class="hidden sm:flex items-center gap-space-xs text-on-surface-variant font-telemetry-mono text-telemetry-mono bg-surface-container-low px-space-sm py-1 rounded"><span class="w-2 h-2 rounded-full bg-primary-fixed animate-pulse"></span><span>LIVE SYNC</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full max-w-[1200px] mx-auto px-margin pt-20 pb-space-xl flex-1"><div class="flex flex-col w-full">
+<div class="relative w-full max-w-[1100px] mx-auto py-space-md flex flex-col gap-space-lg">
+<div class="absolute -top-12 left-1/2 -translate-x-1/2 w-[600px] h-[180px] bg-primary-container/10 blur-[90px] pointer-events-none rounded-full"></div>
+<section class="relative flex flex-col gap-space-xs text-center md:text-left">
+<div class="flex flex-wrap items-center justify-center md:justify-start gap-space-xs font-telemetry-mono text-telemetry-mono uppercase tracking-widest text-primary-fixed">
+<span class="w-2 h-2 rounded-full bg-primary-container animate-ping"></span>
+<span>CENTRO DE COMANDO · PROTOCOLO ELIMINATÓRIO ATIVO</span>
+<span class="text-outline-variant">/</span>
+<span class="text-on-surface-variant">FASE REGIONAL 2025</span>
+</div>
+<h1 class="font-display-hero text-headline-xl md:text-display-hero uppercase tracking-tight text-primary font-extrabold leading-none">
+        FORME SUA DINASTIA <br class="hidden sm:block"/>
+<span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary-container to-secondary">NO MATA-MATA</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+        11 escolhas implacáveis. 4 rodadas eliminatórias. Sem prorrogação prévia. Um tropeço e o sonho acaba na lama da arquibancada.
+      </p>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+<section class="lg:col-span-6 flex flex-col gap-space-md bg-surface-container-low p-space-lg rounded-xl shadow-xl">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary-fixed text-[20px]">shield</span>
+<span class="font-headline-sm text-headline-sm uppercase text-primary tracking-wide">Identidade &amp; Cores</span>
+</div>
+<span class="font-label-badge text-label-badge text-secondary bg-surface-container-highest px-space-xs py-0.5 rounded uppercase">Passo 01 / 02</span>
+</div>
+<div class="flex flex-col gap-space-xs">
+<label class="font-telemetry-mono text-telemetry-mono uppercase text-on-surface-variant flex items-center justify-between">
+<span>NOME DO CLUBE</span>
+<span class="text-primary-fixed">PATENTE: CAPITÃO</span>
+</label>
+<div class="relative flex items-center">
+<div class="absolute left-3 flex items-center justify-center w-7 h-7 rounded bg-surface-container-highest text-secondary font-headline-sm text-[13px] font-bold">
+              C
+            </div>
+<input class="w-full bg-surface-container-lowest text-on-surface font-headline-md text-headline-md tracking-wider uppercase pl-12 pr-4 py-space-sm rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-container transition-all" id="clubNameInput" placeholder="DIGITE O NOME..." type="text" value="SÃO BENTO F.C."/>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-12 gap-space-md items-center bg-surface-container-lowest p-space-md rounded-lg">
+<div class="sm:col-span-5 flex flex-col items-center justify-center p-space-sm bg-surface-container rounded-lg relative overflow-hidden">
+<div class="relative w-24 h-28 flex items-center justify-center">
+<svg class="w-full h-full drop-shadow-[0_8px_16px_rgba(0,0,0,0.6)] transition-transform duration-300 hover:scale-105" id="kitSvg" viewbox="0 0 100 120">
+<defs>
+<lineargradient id="kitStripe1" x1="0%" x2="100%" y1="0%" y2="0%">
+<stop id="gradC1" offset="0%" stop-color="#0F766E"></stop>
+<stop id="gradC1b" offset="45%" stop-color="#0F766E"></stop>
+<stop id="gradC2" offset="55%" stop-color="#EAB308"></stop>
+<stop id="gradC2b" offset="100%" stop-color="#EAB308"></stop>
+</lineargradient>
+</defs>
+<path d="M 30 10 L 45 22 C 50 24 50 24 55 22 L 70 10 L 88 28 L 78 44 L 72 38 L 72 108 L 28 108 L 28 38 L 22 44 L 12 28 Z" fill="url(#kitStripe1)" stroke="#ffffff" stroke-opacity="0.1" stroke-width="1.5"></path>
+<path d="M 45 22 C 50 24 50 24 55 22 L 50 27 Z" fill="#ffffff" opacity="0.2"></path>
+<circle cx="36" cy="40" fill="#ffffff" opacity="0.2" r="7"></circle>
+<path d="M 36 34 L 41 38 L 36 45 L 31 38 Z" fill="#FFE083" id="crestEmblem"></path>
+<text fill="#ffffff" font-family="'JetBrains Mono'" font-size="28" font-weight="800" opacity="0.9" text-anchor="middle" x="50" y="78">10</text>
+</svg>
+</div>
+<span class="font-telemetry-mono text-[10px] text-center uppercase tracking-widest text-on-surface-variant mt-2 font-bold truncate max-w-full" id="clubDisplayPreview">
+              SÃO BENTO F.C.
+            </span>
+</div>
+<div class="sm:col-span-7 flex flex-col gap-space-xs">
+<span class="font-telemetry-mono text-telemetry-mono uppercase text-on-surface-variant">PARES DE COR DO UNIFORME</span>
+<div class="grid grid-cols-2 gap-2" id="colorPaletteGroup">
+<button class="kit-palette-btn active flex items-center gap-2 p-2 rounded bg-surface-container hover:bg-surface-container-high transition-all text-left" data-c1="#0F766E" data-c2="#EAB308" data-name="Azul Petróleo &amp; Dourado" type="button">
+<div class="flex -space-x-1.5">
+<span class="w-4 h-4 rounded-full bg-[#0F766E] shadow-sm"></span>
+<span class="w-4 h-4 rounded-full bg-[#EAB308] shadow-sm"></span>
+</div>
+<span class="font-telemetry-mono text-[10px] text-on-surface leading-tight font-medium">Petróleo / Ouro</span>
+</button>
+<button class="kit-palette-btn flex items-center gap-2 p-2 rounded bg-surface-container hover:bg-surface-container-high transition-all text-left" data-c1="#00FF87" data-c2="#1E293B" data-name="Verde Neon &amp; Preto Ardósia" type="button">
+<div class="flex -space-x-1.5">
+<span class="w-4 h-4 rounded-full bg-[#00FF87] shadow-sm"></span>
+<span class="w-4 h-4 rounded-full bg-[#1E293B] shadow-sm"></span>
+</div>
+<span class="font-telemetry-mono text-[10px] text-on-surface leading-tight font-medium">Neon / Ardósia</span>
+</button>
+<button class="kit-palette-btn flex items-center gap-2 p-2 rounded bg-surface-container hover:bg-surface-container-high transition-all text-left" data-c1="#DC2626" data-c2="#F8FAFC" data-name="Vermelho Carmim &amp; Branco Gelo" type="button">
+<div class="flex -space-x-1.5">
+<span class="w-4 h-4 rounded-full bg-[#DC2626] shadow-sm"></span>
+<span class="w-4 h-4 rounded-full bg-[#F8FAFC] shadow-sm"></span>
+</div>
+<span class="font-telemetry-mono text-[10px] text-on-surface leading-tight font-medium">Carmim / Gelo</span>
+</button>
+<button class="kit-palette-btn flex items-center gap-2 p-2 rounded bg-surface-container hover:bg-surface-container-high transition-all text-left" data-c1="#7C3AED" data-c2="#FACC15" data-name="Roxo Cósmico &amp; Amarelo Apito" type="button">
+<div class="flex -space-x-1.5">
+<span class="w-4 h-4 rounded-full bg-[#7C3AED] shadow-sm"></span>
+<span class="w-4 h-4 rounded-full bg-[#FACC15] shadow-sm"></span>
+</div>
+<span class="font-telemetry-mono text-[10px] text-on-surface leading-tight font-medium">Roxo / Apito</span>
+</button>
+</div>
+<div class="font-telemetry-mono text-[11px] text-secondary font-medium mt-1" id="paletteNameDisplay">
+              Azul Petróleo &amp; Dourado
+            </div>
+</div>
+</div>
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-telemetry-mono text-telemetry-mono uppercase text-on-surface-variant">FILOSOFIA DO CLUBE</span>
+<span class="font-telemetry-mono text-[10px] text-primary-fixed uppercase tracking-wider">AFETA MORAL E FÍSICO</span>
+</div>
+<div class="grid grid-cols-2 gap-2" id="philosophyGroup">
+<button class="phil-btn active flex items-start gap-2 p-3 rounded-lg bg-surface-container-highest text-primary-fixed transition-all text-left" data-phil="copera" type="button">
+<span class="material-symbols-outlined text-[20px] text-primary-fixed">local_fire_department</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-[13px] uppercase font-bold text-primary">Raça Copera</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant leading-tight">+25% garra nos 15 min finais</span>
+</div>
+</button>
+<button class="phil-btn flex items-start gap-2 p-3 rounded-lg bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all text-left" data-phil="pressao" type="button">
+<span class="material-symbols-outlined text-[20px] text-secondary">speed</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-[13px] uppercase font-bold text-on-surface">Pressão Sufocante</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant leading-tight">Roubo alto; consome vigor</span>
+</div>
+</button>
+<button class="phil-btn flex items-start gap-2 p-3 rounded-lg bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all text-left" data-phil="posse" type="button">
+<span class="material-symbols-outlined text-[20px] text-surface-tint">sync_alt</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-[13px] uppercase font-bold text-on-surface">Posse Cirúrgica</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant leading-tight">Paciência tática e troca curta</span>
+</div>
+</button>
+<button class="phil-btn flex items-start gap-2 p-3 rounded-lg bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all text-left" data-phil="retranca" type="button">
+<span class="material-symbols-outlined text-[20px] text-error">gshield</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-[13px] uppercase font-bold text-on-surface">Retranca &amp; Golpe</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant leading-tight">Bloco baixo fatal no contra-ataque</span>
+</div>
+</button>
+</div>
+</div>
+</section>
+<section class="lg:col-span-6 flex flex-col gap-space-md bg-surface-container-low p-space-lg rounded-xl shadow-xl">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary-fixed text-[20px]">grid_view</span>
+<span class="font-headline-sm text-headline-sm uppercase text-primary tracking-wide">Formação Tática &amp; Prancheta</span>
+</div>
+<span class="font-label-badge text-label-badge text-primary-fixed bg-surface-container-highest px-space-xs py-0.5 rounded uppercase">Esquema Base</span>
+</div>
+<div class="grid grid-cols-2 gap-2" id="formationCards">
+<div class="formation-card active cursor-pointer p-space-sm rounded-lg bg-surface-container-highest flex flex-col justify-between transition-all" data-formation="4-3-3">
+<div class="flex items-center justify-between mb-1">
+<span class="font-headline-sm text-[14px] uppercase font-extrabold text-primary">4-3-3 Ofensivo</span>
+<span class="material-symbols-outlined text-[16px] text-primary-fixed">check_circle</span>
+</div>
+<p class="font-body-sm text-[11px] text-on-surface-variant leading-tight mb-2">Ideal para volume ofensivo e pontas velozes.</p>
+<div class="flex items-center justify-between font-telemetry-mono text-[10px] bg-surface-container-lowest/80 px-2 py-1 rounded">
+<span class="text-primary-fixed">ATQ <strong class="text-on-surface">88</strong></span>
+<span class="text-secondary">DEF <strong class="text-on-surface">72</strong></span>
+</div>
+</div>
+<div class="formation-card cursor-pointer p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high flex flex-col justify-between transition-all" data-formation="4-4-2">
+<div class="flex items-center justify-between mb-1">
+<span class="font-headline-sm text-[14px] uppercase font-extrabold text-on-surface">4-4-2 Equilibrado</span>
+<span class="material-symbols-outlined text-[16px] text-outline-variant">radio_button_unchecked</span>
+</div>
+<p class="font-body-sm text-[11px] text-on-surface-variant leading-tight mb-2">Domínio tático central e recomposição sólida.</p>
+<div class="flex items-center justify-between font-telemetry-mono text-[10px] bg-surface-container-lowest/80 px-2 py-1 rounded">
+<span class="text-primary-fixed">ATQ <strong class="text-on-surface">80</strong></span>
+<span class="text-secondary">DEF <strong class="text-on-surface">80</strong></span>
+</div>
+</div>
+<div class="formation-card cursor-pointer p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high flex flex-col justify-between transition-all" data-formation="3-5-2">
+<div class="flex items-center justify-between mb-1">
+<span class="font-headline-sm text-[14px] uppercase font-extrabold text-on-surface">3-5-2 Posse</span>
+<span class="material-symbols-outlined text-[16px] text-outline-variant">radio_button_unchecked</span>
+</div>
+<p class="font-body-sm text-[11px] text-on-surface-variant leading-tight mb-2">Asfixia no meio-campo com alas espetados.</p>
+<div class="flex items-center justify-between font-telemetry-mono text-[10px] bg-surface-container-lowest/80 px-2 py-1 rounded">
+<span class="text-primary-fixed">ATQ <strong class="text-on-surface">84</strong></span>
+<span class="text-secondary">DEF <strong class="text-on-surface">76</strong></span>
+</div>
+</div>
+<div class="formation-card cursor-pointer p-space-sm rounded-lg bg-surface-container hover:bg-surface-container-high flex flex-col justify-between transition-all" data-formation="5-3-2">
+<div class="flex items-center justify-between mb-1">
+<span class="font-headline-sm text-[14px] uppercase font-extrabold text-on-surface">5-3-2 Retranca</span>
+<span class="material-symbols-outlined text-[16px] text-outline-variant">radio_button_unchecked</span>
+</div>
+<p class="font-body-sm text-[11px] text-on-surface-variant leading-tight mb-2">Muralha defensiva para segurar resultados magros.</p>
+<div class="flex items-center justify-between font-telemetry-mono text-[10px] bg-surface-container-lowest/80 px-2 py-1 rounded">
+<span class="text-primary-fixed">ATQ <strong class="text-on-surface">70</strong></span>
+<span class="text-secondary">DEF <strong class="text-on-surface">92</strong></span>
+</div>
+</div>
+</div>
+<div class="relative w-full h-64 rounded-lg overflow-hidden bg-surface-container-lowest flex flex-col justify-between p-3">
+<div class="absolute inset-0 opacity-15 pointer-events-none" style="background-image: linear-gradient(#00ff87 1px, transparent 1px), linear-gradient(90deg, #00ff87 1px, transparent 1px); background-size: 24px 24px;"></div>
+<div class="absolute inset-x-8 top-0 h-10 border-b border-primary-container/20 rounded-b-[20px] pointer-events-none"></div>
+<div class="absolute inset-x-12 bottom-0 h-14 border-t border-primary-container/20 rounded-t-[20px] pointer-events-none"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 rounded-full border border-primary-container/20 pointer-events-none"></div>
+<div class="absolute top-1/2 inset-x-0 h-[1px] bg-primary-container/20 pointer-events-none"></div>
+<div class="relative z-10 flex items-center justify-between font-telemetry-mono text-[10px] text-on-surface-variant">
+<span class="bg-surface-container-high/90 px-2 py-0.5 rounded text-primary-fixed font-bold" id="pitchFormationTitle">
+              DISPOSIÇÃO TÁTICA: 4-3-3 OFENSIVO
+            </span>
+<span class="flex items-center gap-1 bg-surface-container-high/90 px-2 py-0.5 rounded">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+              SISTEMA HOMOLOGADO
+            </span>
+</div>
+<div class="relative z-10 flex-1 w-full my-1" id="pitchField">
+</div>
+<div class="relative z-10 flex items-center justify-between font-telemetry-mono text-[10px] text-outline">
+<span>ÁREA TÉCNICA COPERA</span>
+<span class="text-secondary">11 TITULARES CONFIGURADOS</span>
+</div>
+</div>
+</section>
+</div>
+<section class="flex flex-col sm:flex-row items-center justify-between gap-space-md p-space-md md:p-space-lg rounded-xl bg-surface-container-low shadow-2xl">
+<div class="flex items-center gap-space-md w-full sm:w-auto">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-secondary text-[28px]">sports_soccer</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs font-telemetry-mono text-telemetry-mono">
+<span class="text-on-surface-variant uppercase">STATUS DO SORTEIO:</span>
+<span class="text-secondary font-bold">CHAVE C · OITAVAS DE FINAL</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-[14px] text-primary uppercase font-bold">Taxa de Sobrevivência na Copa:</span>
+<span class="font-metric-md text-metric-md text-primary-fixed font-bold bg-surface-container px-2 py-0.5 rounded">12.4%</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-space-md w-full sm:w-auto justify-end">
+<button class="w-full sm:w-auto px-space-lg py-space-md rounded-lg bg-primary-container text-on-primary-container font-headline-sm text-headline-sm uppercase font-black tracking-wider flex items-center justify-center gap-space-sm hover:bg-surface-tint shadow-[0_0_24px_rgba(0,255,135,0.35)] active:scale-[0.98] transition-all cursor-pointer group" id="btnLaunchCampaign" type="button">
+<span>INICIAR CAMPANHA &amp; MONTAR ELENCO</span>
+<span class="material-symbols-outlined text-[20px] font-bold group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</section>
+<div class="flex flex-wrap items-center justify-between gap-space-sm font-telemetry-mono text-[11px] text-on-surface-variant pt-space-xs">
+<div class="flex items-center gap-4">
+<span>MOTOR DE JOGO: V4.8.2-KNOCKOUT</span>
+<span class="text-outline-variant">•</span>
+<span>REGRA: MORTE SÚBITA POR PÊNALTIS SE EMPATAR</span>
+</div>
+<div class="flex items-center gap-2 text-primary-fixed">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+<span>MODO ELIMINATÓRIO SEM VOLTA CERTIFICADO</span>
+</div>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    const formations = {
+      '4-3-3': {
+        title: 'DISPOSIÇÃO TÁTICA: 4-3-3 OFENSIVO',
+        players: [
+          { num: '1', role: 'GK', top: '86%', left: '50%' },
+          { num: '4', role: 'ZAG', top: '70%', left: '38%' },
+          { num: '3', role: 'ZAG', top: '70%', left: '62%' },
+          { num: '6', role: 'LAT', top: '65%', left: '16%' },
+          { num: '2', role: 'LAT', top: '65%', left: '84%' },
+          { num: '5', role: 'VOL', top: '48%', left: '50%' },
+          { num: '8', role: 'MEI', top: '40%', left: '32%' },
+          { num: '10', role: 'MEI', top: '40%', left: '68%' },
+          { num: '11', role: 'PE', top: '16%', left: '18%' },
+          { num: '7', role: 'PD', top: '16%', left: '82%' },
+          { num: '9', role: 'CA', top: '12%', left: '50%' }
+        ]
+      },
+      '4-4-2': {
+        title: 'DISPOSIÇÃO TÁTICA: 4-4-2 EQUILIBRADO',
+        players: [
+          { num: '1', role: 'GK', top: '86%', left: '50%' },
+          { num: '4', role: 'ZAG', top: '70%', left: '38%' },
+          { num: '3', role: 'ZAG', top: '70%', left: '62%' },
+          { num: '6', role: 'LAT', top: '65%', left: '16%' },
+          { num: '2', role: 'LAT', top: '65%', left: '84%' },
+          { num: '5', role: 'VOL', top: '46%', left: '38%' },
+          { num: '8', role: 'VOL', top: '46%', left: '62%' },
+          { num: '11', role: 'MEI', top: '38%', left: '16%' },
+          { num: '7', role: 'MEI', top: '38%', left: '84%' },
+          { num: '9', role: 'CA', top: '16%', left: '38%' },
+          { num: '10', role: 'CA', top: '16%', left: '62%' }
+        ]
+      },
+      '3-5-2': {
+        title: 'DISPOSIÇÃO TÁTICA: 3-5-2 POSSE',
+        players: [
+          { num: '1', role: 'GK', top: '86%', left: '50%' },
+          { num: '4', role: 'ZAG', top: '70%', left: '26%' },
+          { num: '3', role: 'LIB', top: '73%', left: '50%' },
+          { num: '2', role: 'ZAG', top: '70%', left: '74%' },
+          { num: '6', role: 'ALA', top: '44%', left: '12%' },
+          { num: '5', role: 'VOL', top: '50%', left: '50%' },
+          { num: '8', role: 'MEI', top: '40%', left: '35%' },
+          { num: '10', role: 'MEI', top: '40%', left: '65%' },
+          { num: '7', role: 'ALA', top: '44%', left: '88%' },
+          { num: '11', role: 'SA', top: '18%', left: '38%' },
+          { num: '9', role: 'CA', top: '14%', left: '62%' }
+        ]
+      },
+      '5-3-2': {
+        title: 'DISPOSIÇÃO TÁTICA: 5-3-2 RETRANCA',
+        players: [
+          { num: '1', role: 'GK', top: '86%', left: '50%' },
+          { num: '6', role: 'LAT', top: '65%', left: '12%' },
+          { num: '4', role: 'ZAG', top: '72%', left: '31%' },
+          { num: '3', role: 'LIB', top: '75%', left: '50%' },
+          { num: '2', role: 'ZAG', top: '72%', left: '69%' },
+          { num: '14', role: 'LAT', top: '65%', left: '88%' },
+          { num: '5', role: 'VOL', top: '48%', left: '36%' },
+          { num: '8', role: 'VOL', top: '48%', left: '64%' },
+          { num: '10', role: 'MEI', top: '35%', left: '50%' },
+          { num: '7', role: 'ATQ', top: '15%', left: '36%' },
+          { num: '9', role: 'CA', top: '15%', left: '64%' }
+        ]
+      }
+    };
+
+    function renderPitch(formationKey) {
+      const data = formations[formationKey] || formations['4-3-3'];
+      const field = document.getElementById('pitchField');
+      const titleEl = document.getElementById('pitchFormationTitle');
+      if (!field) return;
+
+      if (titleEl) {
+        titleEl.textContent = data.title;
+      }
+
+      field.innerHTML = '';
+      data.players.forEach(p => {
+        const node = document.createElement('div');
+        node.className = 'absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer';
+        node.style.top = p.top;
+        node.style.left = p.left;
+        node.innerHTML = `
+          <div class="w-6 h-6 rounded-full bg-surface-container-highest border border-primary-container text-on-surface font-telemetry-mono text-[10px] font-bold flex items-center justify-center shadow-[0_0_8px_rgba(0,255,135,0.4)] group-hover:scale-110 transition-transform">
+            ${p.num}
+          </div>
+          <span class="font-telemetry-mono text-[8px] font-semibold text-primary-fixed uppercase tracking-wider leading-none mt-0.5">
+            ${p.role}
+          </span>
+        `;
+        field.appendChild(node);
+      });
+    }
+
+    // Formation Cards click
+    const formCards = document.querySelectorAll('.formation-card');
+    formCards.forEach(card => {
+      card.addEventListener('click', () => {
+        formCards.forEach(c => {
+          c.classList.remove('active', 'bg-surface-container-highest');
+          c.classList.add('bg-surface-container');
+          const title = c.querySelector('span.font-headline-sm');
+          if (title) {
+            title.classList.remove('text-primary');
+            title.classList.add('text-on-surface');
+          }
+          const icon = c.querySelector('.material-symbols-outlined');
+          if (icon) {
+            icon.textContent = 'radio_button_unchecked';
+            icon.classList.remove('text-primary-fixed');
+            icon.classList.add('text-outline-variant');
+          }
+        });
+
+        card.classList.add('active', 'bg-surface-container-highest');
+        card.classList.remove('bg-surface-container');
+        const activeTitle = card.querySelector('span.font-headline-sm');
+        if (activeTitle) {
+          activeTitle.classList.add('text-primary');
+          activeTitle.classList.remove('text-on-surface');
+        }
+        const activeIcon = card.querySelector('.material-symbols-outlined');
+        if (activeIcon) {
+          activeIcon.textContent = 'check_circle';
+          activeIcon.classList.add('text-primary-fixed');
+          activeIcon.classList.remove('text-outline-variant');
+        }
+
+        const fKey = card.getAttribute('data-formation');
+        renderPitch(fKey);
+      });
+    });
+
+    // Club name input listener
+    const clubInput = document.getElementById('clubNameInput');
+    const clubDisplay = document.getElementById('clubDisplayPreview');
+    if (clubInput && clubDisplay) {
+      clubInput.addEventListener('input', (e) => {
+        const val = e.target.value.trim();
+        clubDisplay.textContent = val.length > 0 ? val.toUpperCase() : 'MEU CLUBE';
+      });
+    }
+
+    // Kit Palette Buttons
+    const palBtns = document.querySelectorAll('.kit-palette-btn');
+    const grad1 = document.getElementById('gradC1');
+    const grad1b = document.getElementById('gradC1b');
+    const grad2 = document.getElementById('gradC2');
+    const grad2b = document.getElementById('gradC2b');
+    const emblem = document.getElementById('crestEmblem');
+    const palDisplay = document.getElementById('paletteNameDisplay');
+
+    palBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        palBtns.forEach(b => b.classList.remove('active', 'ring-1', 'ring-primary-container'));
+        btn.classList.add('active', 'ring-1', 'ring-primary-container');
+
+        const c1 = btn.getAttribute('data-c1');
+        const c2 = btn.getAttribute('data-c2');
+        const pName = btn.getAttribute('data-name');
+
+        if (grad1) grad1.setAttribute('stop-color', c1);
+        if (grad1b) grad1b.setAttribute('stop-color', c1);
+        if (grad2) grad2.setAttribute('stop-color', c2);
+        if (grad2b) grad2b.setAttribute('stop-color', c2);
+        if (emblem) emblem.setAttribute('fill', c2);
+        if (palDisplay) palDisplay.textContent = pName;
+      });
+    });
+
+    // Philosophy Buttons
+    const philBtns = document.querySelectorAll('.phil-btn');
+    philBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        philBtns.forEach(b => {
+          b.classList.remove('active', 'bg-surface-container-highest', 'text-primary-fixed');
+          b.classList.add('bg-surface-container', 'text-on-surface-variant');
+          const title = b.querySelector('.font-headline-sm');
+          if (title) {
+            title.classList.remove('text-primary');
+            title.classList.add('text-on-surface');
+          }
+        });
+        btn.classList.add('active', 'bg-surface-container-highest', 'text-primary-fixed');
+        btn.classList.remove('bg-surface-container', 'text-on-surface-variant');
+        const activeTitle = btn.querySelector('.font-headline-sm');
+        if (activeTitle) {
+          activeTitle.classList.add('text-primary');
+          activeTitle.classList.remove('text-on-surface');
+        }
+      });
+    });
+
+    // Launch Campaign feedback
+    const launchBtn = document.getElementById('btnLaunchCampaign');
+    if (launchBtn) {
+      launchBtn.addEventListener('click', () => {
+        launchBtn.innerHTML = `
+          <span class="w-4 h-4 rounded-full border-2 border-on-primary-container border-t-transparent animate-spin"></span>
+          <span>SINCRONIZANDO DRAFT TÁTICO...</span>
+        `;
+        setTimeout(() => {
+          const draftLink = document.querySelector('nav a[data-path="draft"]');
+          if (draftLink) {
+            draftLink.click();
+          } else {
+            launchBtn.innerHTML = `
+              <span>ELENCO PRONTO &middot; AVANÇANDO!</span>
+              <span class="material-symbols-outlined text-[20px]">done_all</span>
+            `;
+          }
+        }, 650);
+      });
+    }
+
+    // Initial render
+    renderPitch('4-3-3');
+  })();
+</script></main><footer class="w-full bg-surface-container-lowest/90 backdrop-blur-md"><div class="max-w-[1200px] mx-auto px-margin py-space-sm flex flex-col md:flex-row items-center justify-between gap-space-sm text-on-surface-variant font-telemetry-mono text-telemetry-mono"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs"><span>ATALHOS:</span><kbd class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface">SPACE</kbd><span>Pausa/Play</span><kbd class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface">T</kbd><span>Táticas Rápidas</span><kbd class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface">ESC</kbd><span>Quadro Geral</span></div></div><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-xs cursor-pointer hover:text-on-surface transition-colors"><span class="material-symbols-outlined text-[16px]">volume_up</span><span>ÁUDIO CAMPO: ON</span></div><div class="flex items-center gap-space-xs text-outline"><span class="w-1.5 h-1.5 rounded-full bg-outline"></span><span>MATA-MATA SEM VOLTA</span></div></div></div></footer></body></html>

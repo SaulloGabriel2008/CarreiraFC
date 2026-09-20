@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>COPERO 7x0 - Simulador Tático Eliminatório</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;700;800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; } .pitch-grid-bg { background-color: #0b1326; background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px); background-size: 32px 32px, 100% 64px; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-tint": "#00e478", "tertiary-fixed-dim": "#ffb3ad", "on-tertiary": "#68000a", "surface-container-low": "#131b2e", "primary": "#f1ffef", "on-surface": "#dae2fd", "inverse-on-surface": "#283044", "surface-dim": "#0b1326", "inverse-primary": "#006d36", "surface-container-lowest": "#060e20", "error": "#ffb4ab", "secondary-fixed": "#ffe083", "on-tertiary-fixed-variant": "#930013", "on-tertiary-container": "#bf1f27", "outline": "#849585", "on-secondary": "#3c2f00", "background": "#0b1326", "error-container": "#93000a", "surface-container-highest": "#2d3449", "primary-fixed": "#60ff98", "on-surface-variant": "#b9cbb9", "tertiary-fixed": "#ffdad7", "on-secondary-fixed-variant": "#574500", "surface-container-high": "#222a3d", "tertiary": "#fffaf9", "on-secondary-container": "#645000", "surface-bright": "#31394d", "surface-container": "#171f33", "secondary-fixed-dim": "#eec200", "on-primary-fixed-variant": "#005227", "secondary": "#ffe083", "outline-variant": "#3b4b3d", "tertiary-container": "#ffd5d1", "on-error": "#690005", "secondary-container": "#eec200", "surface": "#0b1326", "on-secondary-fixed": "#231b00", "on-background": "#dae2fd", "on-tertiary-fixed": "#410004", "on-error-container": "#ffdad6", "on-primary": "#003919", "on-primary-container": "#007138", "on-primary-fixed": "#00210c", "surface-variant": "#2d3449", "primary-container": "#00ff87", "inverse-surface": "#dae2fd", "primary-fixed-dim": "#00e478" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-xl": "2rem", "space-sm": "0.5rem", "gutter-tablet": "0.75rem", "margin": "2rem", "space-xs": "0.25rem", "space-md": "1rem", "gutter-mobile": "0.5rem", "margin-tablet": "1rem", "gutter": "1rem", "space-lg": "1.5rem", "margin-mobile": "0.75rem" }, "fontFamily": { "label-badge": ["Plus Jakarta Sans"], "telemetry-mono": ["JetBrains Mono"], "display-hero-mobile": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "metric-xl": ["JetBrains Mono"], "metric-md": ["JetBrains Mono"], "headline-xl": ["Plus Jakarta Sans"], "headline-xl-mobile": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"], "metric-lg": ["JetBrains Mono"], "headline-lg": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "display-hero": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"] }, "fontSize": { "label-badge": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "800" }], "telemetry-mono": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }], "display-hero-mobile": ["36px", { "lineHeight": "42px", "letterSpacing": "-0.02em", "fontWeight": "800" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "metric-xl": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.04em", "fontWeight": "700" }], "metric-md": ["15px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800" }], "headline-xl-mobile": ["26px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "metric-lg": ["22px", { "lineHeight": "26px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "headline-lg": ["24px", { "lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "headline-md": ["20px", { "lineHeight": "26px", "letterSpacing": "0em", "fontWeight": "700" }], "headline-sm": ["16px", { "lineHeight": "22px", "letterSpacing": "0.02em", "fontWeight": "700" }], "display-hero": ["56px", { "lineHeight": "64px", "letterSpacing": "-0.03em", "fontWeight": "800" }], "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }] } } } };</script></head><body class="bg-surface pitch-grid-bg font-body-md text-on-surface min-h-screen flex flex-col justify-between selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="h-20 max-w-[1200px] mx-auto px-margin flex items-center justify-between gap-gutter"><div class="flex items-center gap-space-md"><img alt="Copero 7x0 Tactical Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1V6ZEFZHn7tOHWrL-cUGzSqIO05lTSxENwZVLZz2sJPg6rZmUjNRqXclih1AiM0xUFhZtEKODOfvSlTSHDlkVBnHIe9htv7-zkp5KheDWSIqkaxvIA4F7TDT0-pTFuw99-T4BKnq-mwkVnWmoSmIWaBDTU01DRdEBfOEz68LAHG2bWkBgFO4Xy9WCID2-Ec5rBSd4PzMsprTEJo8Mnfe1aCkV7hjwnAh8IxUNWZ6VRkEIQEng2N9tWnTw"/><div class="flex flex-col"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm uppercase tracking-wider text-primary font-bold">Copero 7x0</span><span class="px-space-xs py-0.5 rounded bg-surface-container-high text-primary-fixed font-telemetry-mono text-telemetry-mono border border-surface-bright">TEMPORADA 2025 - V1.4.0</span></div><span class="font-telemetry-mono text-telemetry-mono text-on-surface-variant uppercase tracking-widest">Prancheta Tática · Eliminatória Sim</span></div></div><div class="hidden lg:flex items-center gap-space-sm bg-surface-container-low px-space-md py-space-xs rounded-lg"><div class="flex items-center gap-space-xs"><div class="w-3 h-3 rounded-full bg-[#10b981]"></div><div class="w-3 h-3 rounded-full bg-[#ffffff]"></div></div><div class="flex flex-col"><span class="font-headline-sm text-[12px] uppercase leading-none font-bold text-on-surface">Guaíba FC</span><span class="font-telemetry-mono text-[10px] uppercase text-on-surface-variant">Série Ouro · 4-3-3 Ofensivo</span></div><span class="ml-space-xs px-space-xs py-0.5 rounded bg-secondary-container/20 text-secondary font-label-badge text-label-badge uppercase">Quartas</span></div><nav class="hidden md:flex items-center gap-space-xs bg-surface-container-low p-1 rounded-xl" data-active-classes="bg-primary-container text-on-primary-container font-bold rounded-lg shadow-[0_0_12px_rgba(0,255,135,0.25)]"><a class="px-space-md py-space-xs rounded-lg font-headline-sm text-[13px] uppercase tracking-wide text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="identidade" href="#">Identidade</a><a class="px-space-md py-space-xs rounded-lg font-headline-sm text-[13px] uppercase tracking-wide text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="draft" href="#">Draft</a><a class="px-space-md py-space-xs rounded-lg font-headline-sm text-[13px] uppercase tracking-wide text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="pre-jogo" href="#">Pré-Jogo</a><a class="px-space-md py-space-xs rounded-lg font-headline-sm text-[13px] uppercase tracking-wide text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="partida" href="#">Partida</a><a class="px-space-md py-space-xs rounded-lg font-headline-sm text-[13px] uppercase tracking-wide text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="pos-jogo" href="#">Pós-Jogo</a></nav><div class="flex items-center gap-space-md"><div class="hidden sm:flex items-center gap-space-xs text-on-surface-variant font-telemetry-mono text-telemetry-mono bg-surface-container-low px-space-sm py-1 rounded"><span class="w-2 h-2 rounded-full bg-primary-fixed animate-pulse"></span><span>LIVE SYNC</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full max-w-[1200px] mx-auto px-margin pt-20 pb-space-xl flex-1"><div class="flex flex-col w-full">
+<!-- Subtle Ambient Glow Backdrop -->
+<div class="relative w-full overflow-hidden">
+<div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[720px] h-[280px] bg-gradient-to-b from-primary-container/10 via-secondary-container/5 to-transparent blur-3xl pointer-events-none"></div>
+<!-- 1. HEADER TELEMETRY & PHASE CHIP -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm pb-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="px-space-sm py-1 rounded bg-secondary-container/15 text-secondary font-label-badge text-label-badge uppercase tracking-wider flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-secondary-container animate-ping"></span>
+          FASE ELIMINATÓRIA • JOGO ÚNICO
+        </span>
+<span class="font-telemetry-mono text-telemetry-mono text-on-surface-variant uppercase">
+          ESTÁDIO ARENA DOS PAMPAS • CLIMA: CHUVA TÁTICA (14°C)
+        </span>
+</div>
+<div class="flex items-center gap-space-md font-telemetry-mono text-telemetry-mono text-on-surface-variant">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-outline text-[16px]">timer</span>
+          T-MINUS: <span class="text-primary font-bold" id="countdown-chip">00:03</span>
+</span>
+<span class="text-outline">/</span>
+<span class="text-primary-fixed">VAR TÁTICO LIGADO</span>
+</div>
+</div>
+<!-- 2. HORIZONTAL BRACKET LADDER / ESCADA DE DIFICULDADE (4 ETAPAS DA GLÓRIA) -->
+<div class="w-full bg-surface-container-low rounded-xl p-space-md md:p-space-lg mb-space-lg relative overflow-hidden shadow-lg">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[18px]">account_tree</span>
+<span class="font-headline-sm text-headline-sm uppercase text-primary">Caminho da Glória Mata-Mata</span>
+</div>
+<span class="font-telemetry-mono text-telemetry-mono text-on-surface-variant">FORMATO: MORTE SÚBITA (90' + PÊNALTIS)</span>
+</div>
+<!-- Stepper Nodes Track -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-space-md relative mt-space-md">
+<!-- Node 1: Oitavas (VENCIDO) -->
+<div class="bg-surface-container rounded-lg p-space-md relative flex flex-col justify-between group transition-all">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-telemetry-mono text-[10px] uppercase text-outline">Etapa 01 / 04</span>
+<span class="px-1.5 py-0.5 rounded bg-primary-container/20 text-primary-fixed-dim font-label-badge text-label-badge flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">check_circle</span> VENCIDO
+            </span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-primary">Oitavas de Final</h4>
+<p class="font-telemetry-mono text-telemetry-mono text-on-surface-variant mt-0.5">3 × 1 vs Grêmio Bagé</p>
+</div>
+<div class="mt-space-sm pt-space-xs flex items-center justify-between text-on-surface-variant font-telemetry-mono text-[10px]">
+<span>Gols: F. Prado (2), Deco</span>
+<span class="text-primary-fixed font-bold">+120 XP</span>
+</div>
+<div class="absolute bottom-0 left-0 right-0 h-1 bg-primary-container rounded-b"></div>
+</div>
+<!-- Node 2: Quartas (CONFRONTO ATUAL - ILUMINADO) -->
+<div class="bg-surface-container-high rounded-lg p-space-md relative flex flex-col justify-between shadow-xl ring-0 scale-[1.02]">
+<div class="absolute -top-2.5 right-3 px-2 py-0.5 rounded bg-secondary-container text-on-secondary-container font-label-badge text-label-badge uppercase tracking-wider flex items-center gap-1 shadow-md">
+<span class="w-1.5 h-1.5 rounded-full bg-surface-container-lowest animate-pulse"></span> AO VIVO AGORA
+          </div>
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-telemetry-mono text-[10px] uppercase text-secondary font-bold">Etapa 02 / 04 • Chave A</span>
+<span class="px-1.5 py-0.5 rounded bg-secondary/15 text-secondary font-label-badge text-label-badge">EM DISPUTA</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-primary">Quartas de Final</h4>
+<p class="font-telemetry-mono text-telemetry-mono text-secondary font-semibold mt-0.5">vs Atlético Copacabana</p>
+</div>
+<div class="mt-space-sm pt-space-xs flex items-center justify-between text-on-surface-variant font-telemetry-mono text-[10px]">
+<span class="text-on-surface">Pressão tática: Alta</span>
+<span class="text-secondary font-bold">VAGA NA SEMI</span>
+</div>
+<div class="absolute bottom-0 left-0 right-0 h-1 bg-secondary-container rounded-b animate-pulse"></div>
+</div>
+<!-- Node 3: Semifinal (PENDENTE) -->
+<div class="bg-surface-container-lowest/80 rounded-lg p-space-md relative flex flex-col justify-between opacity-70">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-telemetry-mono text-[10px] uppercase text-outline">Etapa 03 / 04</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-outline font-label-badge text-label-badge flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">lock</span> BLOQUEADO
+            </span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface-variant">Semifinal</h4>
+<p class="font-telemetry-mono text-telemetry-mono text-outline mt-0.5">Aguardando Vencedor C2 × D2</p>
+</div>
+<div class="mt-space-sm pt-space-xs flex items-center justify-between text-outline font-telemetry-mono text-[10px]">
+<span>Projeção: Caxias do Sul</span>
+<span>DATA: 18/11</span>
+</div>
+<div class="absolute bottom-0 left-0 right-0 h-1 bg-surface-container-highest rounded-b"></div>
+</div>
+<!-- Node 4: Final (TROFÉU DA COPA) -->
+<div class="bg-surface-container-lowest/90 rounded-lg p-space-md relative flex flex-col justify-between">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-telemetry-mono text-[10px] uppercase text-secondary-fixed">Etapa 04 / 04 • DECISÃO</span>
+<span class="px-1.5 py-0.5 rounded bg-secondary-fixed/20 text-secondary-fixed font-label-badge text-label-badge flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">emoji_events</span> TROFÉU
+            </span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-secondary-fixed">Grande Final</h4>
+<p class="font-telemetry-mono text-telemetry-mono text-on-surface mt-0.5 font-bold">PREMIAÇÃO: R$ 10.000.000</p>
+</div>
+<div class="mt-space-sm pt-space-xs flex items-center justify-between text-on-surface-variant font-telemetry-mono text-[10px]">
+<span class="text-secondary-fixed-dim">Taça dos Campeões 2025</span>
+<span class="text-on-surface font-bold">ESTÁDIO NEUTRO</span>
+</div>
+<div class="absolute bottom-0 left-0 right-0 h-1 bg-secondary-fixed-dim rounded-b"></div>
+</div>
+</div>
+</div>
+<!-- 3. CENTRAL DRAMATIC MATCHUP CARD (LADO A LADO) -->
+<div class="w-full bg-surface-container rounded-xl p-space-md md:p-space-lg mb-space-lg relative shadow-2xl">
+<!-- Matchup Top Context Banner -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm pb-space-md border-b-0 mb-space-md bg-surface-container-lowest/60 p-space-sm rounded-lg">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary-fixed text-[20px]">sports_soccer</span>
+<span class="font-headline-sm text-headline-sm uppercase text-primary">Relatório Pré-Combate Tático</span>
+</div>
+<div class="flex items-center gap-space-md font-telemetry-mono text-telemetry-mono">
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span>PROBABILIDADE IA:</span>
+<span class="text-primary-fixed font-bold">58% VITÓRIA</span>
+<span class="text-outline">|</span>
+<span class="text-tertiary-fixed-dim font-bold">42% ZEBRA</span>
+</div>
+</div>
+</div>
+<!-- The Versus Split Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md items-stretch">
+<!-- CLUB A: SÃO BENTO F.C. (Left, 4 Cols) -->
+<div class="lg:col-span-4 bg-surface-container-low rounded-lg p-space-md flex flex-col justify-between relative overflow-hidden">
+<div class="flex items-start justify-between">
+<div>
+<span class="px-space-xs py-0.5 rounded bg-surface-container-high text-primary-fixed font-label-badge text-label-badge uppercase">MANDANTE • SEU TIME</span>
+<h3 class="font-headline-lg text-headline-lg uppercase text-primary mt-1 tracking-tight">SÃO BENTO F.C.</h3>
+<p class="font-telemetry-mono text-telemetry-mono text-on-surface-variant">Esquema: 4-3-3 Ofensivo Amplo</p>
+</div>
+<!-- Tactical Crest Placeholder -->
+<div class="w-16 h-16 rounded-xl bg-surface-container-high flex flex-col items-center justify-center p-1 shadow-inner relative">
+<img class="w-12 h-12 object-contain" data-alt="A tactical heraldic sports club crest for São Bento FC in dark navy blue, metallic gold accents, and sharp geometric lightning icons on a dark turf background, sports broadcast aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdEcR7JfziG7-cnmyButJDwuBzP9GxoyDisLxj54UKgoDJVSF8sKzt7jnvDxgapUds8cNi2JCKPxPZTwxovd0ZQzkuwhd_L8TI5jpbe7h4LOeAI9JJCsZtCKAR0FZsmlb5UTE2WKleW8FRRkCiO9MOPLGhAJjs1BWPaH1gRyqQlB2mdQ3QUgHBV0ro4SzQv9fvkbOK_DpR2pBXsJLJOtOP4PxxRFfv1I4o2uWWa0u_CrBnAu-XF4eZ"/>
+</div>
+</div>
+<!-- Squad Specs -->
+<div class="my-space-md space-y-space-xs">
+<div class="flex items-baseline justify-between">
+<span class="font-telemetry-mono text-telemetry-mono text-on-surface-variant">OVERALL MÉDIO</span>
+<span class="font-metric-xl text-metric-xl text-primary-fixed font-bold leading-none">83</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-telemetry-mono text-[11px] bg-surface-container px-space-sm py-1 rounded">
+<span>MORAL DE VESTIÁRIO</span>
+<span class="text-primary-fixed font-bold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">trending_up</span> EM ALTA (+5% FOCO)
+              </span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-telemetry-mono text-[11px] bg-surface-container px-space-sm py-1 rounded">
+<span>FORMA NOS ÚLTIMOS 5</span>
+<div class="flex items-center gap-1 font-bold">
+<span class="w-4 h-4 rounded bg-primary-container text-on-primary-container flex items-center justify-center text-[9px]">V</span>
+<span class="w-4 h-4 rounded bg-primary-container text-on-primary-container flex items-center justify-center text-[9px]">V</span>
+<span class="w-4 h-4 rounded bg-secondary-container text-on-secondary-container flex items-center justify-center text-[9px]">E</span>
+<span class="w-4 h-4 rounded bg-primary-container text-on-primary-container flex items-center justify-center text-[9px]">V</span>
+<span class="w-4 h-4 rounded bg-primary-container text-on-primary-container flex items-center justify-center text-[9px]">V</span>
+</div>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-telemetry-mono text-[11px] bg-surface-container px-space-sm py-1 rounded">
+<span>CONDICIONAMENTO GERAL</span>
+<span class="text-on-surface font-semibold">96% • ELENCO PLENO</span>
+</div>
+</div>
+<!-- Highlight player token -->
+<div class="bg-surface-container-high rounded-lg p-space-xs flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded bg-surface-dim flex items-center justify-center text-primary font-metric-md font-bold">
+              10
+            </div>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-[12px] text-on-surface uppercase truncate">Lucas 'Deco' Arantes</span>
+<span class="font-telemetry-mono text-[10px] text-primary-fixed">MEI • Maestro • 87 OVR</span>
+</div>
+</div>
+</div>
+<!-- CENTER: COMPARISON BAR-BY-BAR & VS (Center, 4 Cols) -->
+<div class="lg:col-span-4 bg-surface-container-lowest rounded-lg p-space-md flex flex-col justify-between">
+<div class="text-center pb-space-xs">
+<span class="font-display-hero text-headline-xl text-primary font-black tracking-tighter inline-block">VS</span>
+<p class="font-telemetry-mono text-telemetry-mono text-on-surface-variant">MATRIZ TÁTICA COMPARATIVA</p>
+</div>
+<!-- Metric Comparison Stack -->
+<div class="space-y-space-md my-auto">
+<!-- 1. Força de Ataque (84 vs 86) -->
+<div>
+<div class="flex justify-between items-center text-telemetry-mono font-telemetry-mono mb-1">
+<span class="text-primary-fixed font-bold">84</span>
+<span class="text-on-surface-variant text-[11px] uppercase tracking-wider">Força de Ataque</span>
+<span class="text-tertiary-fixed-dim font-bold">86</span>
+</div>
+<div class="grid grid-cols-2 gap-1 h-2 rounded overflow-hidden bg-surface-container-high">
+<div class="flex justify-end bg-surface-container-high">
+<div class="h-full bg-primary-container rounded-l" style="width: 84%;"></div>
+</div>
+<div class="flex justify-start bg-surface-container-high">
+<div class="h-full bg-tertiary-container rounded-r" style="width: 86%;"></div>
+</div>
+</div>
+</div>
+<!-- 2. Domínio de Meio-Campo (83 vs 77) -->
+<div>
+<div class="flex justify-between items-center text-telemetry-mono font-telemetry-mono mb-1">
+<span class="text-primary-fixed font-bold">83</span>
+<span class="text-on-surface-variant text-[11px] uppercase tracking-wider">Domínio de Meio-Campo</span>
+<span class="text-tertiary-fixed-dim font-bold">77</span>
+</div>
+<div class="grid grid-cols-2 gap-1 h-2 rounded overflow-hidden bg-surface-container-high">
+<div class="flex justify-end bg-surface-container-high">
+<div class="h-full bg-primary-container rounded-l" style="width: 83%;"></div>
+</div>
+<div class="flex justify-start bg-surface-container-high">
+<div class="h-full bg-tertiary-container rounded-r" style="width: 77%;"></div>
+</div>
+</div>
+</div>
+<!-- 3. Solidez Defensiva (81 vs 79) -->
+<div>
+<div class="flex justify-between items-center text-telemetry-mono font-telemetry-mono mb-1">
+<span class="text-primary-fixed font-bold">81</span>
+<span class="text-on-surface-variant text-[11px] uppercase tracking-wider">Solidez Defensiva</span>
+<span class="text-tertiary-fixed-dim font-bold">79</span>
+</div>
+<div class="grid grid-cols-2 gap-1 h-2 rounded overflow-hidden bg-surface-container-high">
+<div class="flex justify-end bg-surface-container-high">
+<div class="h-full bg-primary-container rounded-l" style="width: 81%;"></div>
+</div>
+<div class="flex justify-start bg-surface-container-high">
+<div class="h-full bg-tertiary-container rounded-r" style="width: 79%;"></div>
+</div>
+</div>
+</div>
+<!-- 4. Nível do Goleiro (86 vs 82) -->
+<div>
+<div class="flex justify-between items-center text-telemetry-mono font-telemetry-mono mb-1">
+<span class="text-primary-fixed font-bold">86</span>
+<span class="text-on-surface-variant text-[11px] uppercase tracking-wider">Nível do Goleiro</span>
+<span class="text-tertiary-fixed-dim font-bold">82</span>
+</div>
+<div class="grid grid-cols-2 gap-1 h-2 rounded overflow-hidden bg-surface-container-high">
+<div class="flex justify-end bg-surface-container-high">
+<div class="h-full bg-primary-container rounded-l" style="width: 86%;"></div>
+</div>
+<div class="flex justify-start bg-surface-container-high">
+<div class="h-full bg-tertiary-container rounded-r" style="width: 82%;"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Tactical Summary Quote -->
+<div class="mt-space-sm pt-space-xs text-center">
+<span class="font-telemetry-mono text-[10px] text-on-surface-variant uppercase">
+              VANTAGEM NOSSA NA POSSE • CUIDADO NAS TRANSIÇÕES
+            </span>
+</div>
+</div>
+<!-- CLUB B: ATLÉTICO COPACABANA (Right, 4 Cols) -->
+<div class="lg:col-span-4 bg-surface-container-low rounded-lg p-space-md flex flex-col justify-between relative overflow-hidden">
+<div class="flex items-start justify-between">
+<!-- Tactical Crest Placeholder -->
+<div class="w-16 h-16 rounded-xl bg-surface-container-high flex flex-col items-center justify-center p-1 shadow-inner relative order-2 sm:order-1">
+<img class="w-12 h-12 object-contain" data-alt="A tactical badge for Atlético Copacabana club in aggressive blood crimson red and matte black, featuring a stylized falcon and vertical stripes, esports and broadcast graphic design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAopOmJRxcNnKFY0eDWRTX-F9pMhgMX-7KwOUJOWVTGGAI5-c7uar3AEadx4-kU8_UM47wy2K5BD7ku352iePJQTPXOSqlyz400bTbRjFSMU_wbb30Bqw9CBLt6K4gBHcoHOgRmIm1Bvxc7Qvwh4Ff5fm9ivcbEjMXKLxDw_gvuGLGhDp5jBDCgrHGlbo7q2NavCmVGQo-3qKdxq3zI-H1wQz8GI6tzeeZv4hO8jBMHVEb_7_iiSsfb"/>
+</div>
+<div class="text-right order-1 sm:order-2">
+<span class="px-space-xs py-0.5 rounded bg-tertiary-container/20 text-tertiary-fixed-dim font-label-badge text-label-badge uppercase">VISITANTE • ADVERSÁRIO</span>
+<h3 class="font-headline-lg text-headline-lg uppercase text-primary mt-1 tracking-tight">ATLÉTICO COPACABANA</h3>
+<p class="font-telemetry-mono text-telemetry-mono text-on-surface-variant">Esquema: 5-2-3 Espelho Baixo</p>
+</div>
+</div>
+<!-- Opponent Specs -->
+<div class="my-space-md space-y-space-xs">
+<div class="flex items-baseline justify-between">
+<span class="font-telemetry-mono text-telemetry-mono text-tertiary-fixed-dim font-bold">81</span>
+<span class="font-telemetry-mono text-telemetry-mono text-on-surface-variant">OVERALL MÉDIO</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-telemetry-mono text-[11px] bg-surface-container px-space-sm py-1 rounded">
+<span class="text-tertiary-fixed-dim font-bold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">bolt</span> VELOCIDADE 89
+              </span>
+<span>PONTO FORTE: CONTRA-ATAQUE</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-telemetry-mono text-[11px] bg-surface-container px-space-sm py-1 rounded">
+<div class="flex items-center gap-1 font-bold">
+<span class="w-4 h-4 rounded bg-primary-container text-on-primary-container flex items-center justify-center text-[9px]">V</span>
+<span class="w-4 h-4 rounded bg-tertiary-container text-on-tertiary-container flex items-center justify-center text-[9px]">D</span>
+<span class="w-4 h-4 rounded bg-primary-container text-on-primary-container flex items-center justify-center text-[9px]">V</span>
+<span class="w-4 h-4 rounded bg-primary-container text-on-primary-container flex items-center justify-center text-[9px]">V</span>
+<span class="w-4 h-4 rounded bg-secondary-container text-on-secondary-container flex items-center justify-center text-[9px]">E</span>
+</div>
+<span>FORMA NOS ÚLTIMOS 5</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-telemetry-mono text-[11px] bg-surface-container px-space-sm py-1 rounded">
+<span class="text-tertiary-fixed-dim font-semibold">ALTA FISICALIDADE</span>
+<span>ESTILO DE FALTA: DURO</span>
+</div>
+</div>
+<!-- Opponent Danger Token -->
+<div class="bg-surface-container-high rounded-lg p-space-xs flex items-center justify-end gap-space-sm">
+<div class="flex flex-col text-right min-w-0">
+<span class="font-headline-sm text-[12px] text-on-surface uppercase truncate">Marlon 'Flecha' Dias</span>
+<span class="font-telemetry-mono text-[10px] text-tertiary-fixed-dim">PON • Velocista • 88 OVR</span>
+</div>
+<div class="w-10 h-10 rounded bg-surface-dim flex items-center justify-center text-tertiary-fixed-dim font-metric-md font-bold">
+              07
+            </div>
+</div>
+</div>
+</div>
+</div>
+<!-- 4. PAINEL DE AJUSTES RÁPIDOS PRÉ-JOGO (3 POSTURAS TÁTICAS) -->
+<div class="w-full bg-surface-container-low rounded-xl p-space-md md:p-space-lg mb-space-lg shadow-lg">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs mb-space-md">
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary-fixed text-[20px]">tune</span>
+<h3 class="font-headline-sm text-headline-sm uppercase text-primary">Instrução Tática Imediata do Treinador</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+            Selecione a postura inicial para anular a velocidade do Copacabana antes do apito do árbitro.
+          </p>
+</div>
+<span class="font-telemetry-mono text-telemetry-mono text-primary-fixed bg-surface-container px-space-sm py-1 rounded uppercase">
+          MUDANÇAS ATIVAS NO 1º TEMPO
+        </span>
+</div>
+<!-- Actionable Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md" id="tactics-selector">
+<!-- Posture Option 1 -->
+<button class="tactic-card text-left p-space-md rounded-lg bg-surface-container hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer group" data-tactic-index="0" onclick="selectTactic(0)" type="button">
+<div>
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-headline-sm text-[14px] uppercase text-primary font-bold">Pressão Alta no Campo</span>
+<span class="radio-indicator w-5 h-5 rounded-full bg-surface-bright flex items-center justify-center text-transparent">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Sufoca a saída rubro-negra e força erros no campo deles. Aumenta chances criadas, mas abre corredor para Marlon Dias nas costas dos laterais.
+            </p>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center justify-between font-telemetry-mono text-[10px]">
+<span class="text-primary-fixed">+18% GOLS MARCADOS</span>
+<span class="text-tertiary-fixed-dim">+24% VULNERABILIDADE</span>
+</div>
+</button>
+<!-- Posture Option 2 (ACTIVE BY DEFAULT) -->
+<button class="tactic-card active-tactic text-left p-space-md rounded-lg bg-surface-container-highest transition-all flex flex-col justify-between cursor-pointer group shadow-[0_0_16px_rgba(0,255,135,0.15)]" data-tactic-index="1" onclick="selectTactic(1)" type="button">
+<div>
+<div class="flex items-center justify-between mb-space-xs">
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-[14px] uppercase text-primary font-bold">Linhas Médias e Posse</span>
+<span class="px-1.5 py-0.2 rounded bg-primary-container text-on-primary-container font-label-badge text-[10px] uppercase">ATIVO</span>
+</div>
+<span class="radio-indicator w-5 h-5 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface">
+              Controle cirúrgico com Deco Arantes. Cozinha o adversário, mantém posse superior a 60% e minimiza contra-ataques velozes sem fadiga excessiva.
+            </p>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center justify-between font-telemetry-mono text-[10px]">
+<span class="text-primary-fixed">+64% DOMÍNIO DO RITMO</span>
+<span class="text-primary-fixed-dim">-35% RISCO DE CONTRA-GOLPE</span>
+</div>
+</button>
+<!-- Posture Option 3 -->
+<button class="tactic-card text-left p-space-md rounded-lg bg-surface-container hover:bg-surface-container-high transition-all flex flex-col justify-between cursor-pointer group" data-tactic-index="2" onclick="selectTactic(2)" type="button">
+<div>
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-headline-sm text-[14px] uppercase text-primary font-bold">Linhas Baixas e Bola Longa</span>
+<span class="radio-indicator w-5 h-5 rounded-full bg-surface-bright flex items-center justify-center text-transparent">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Tranca a entrada da grande área em bloco duplo de 4 e aciona lançamentos diretos para os extremos. Postura ultra-cautelosa para levar pros pênaltis.
+            </p>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center justify-between font-telemetry-mono text-[10px]">
+<span class="text-primary-fixed">+40% BLOQUEIOS</span>
+<span class="text-secondary">-25% VOLUME OFENSIVO</span>
+</div>
+</button>
+</div>
+</div>
+<!-- 5. TENSIVE ACTION CALLOUT & PRIMARY BUTTON -->
+<div class="w-full bg-surface-container-lowest p-space-lg rounded-xl flex flex-col md:flex-row items-center justify-between gap-space-md shadow-2xl relative overflow-hidden">
+<!-- Decorative Neon Bar -->
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary-container"></div>
+<div class="flex items-center gap-space-md">
+<div class="w-12 h-12 rounded-lg bg-primary-container/10 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[28px] animate-pulse">sports</span>
+</div>
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-md text-headline-md uppercase text-primary font-black tracking-tight">Vestiário Pronto</span>
+<span class="px-space-xs py-0.5 rounded bg-secondary-container/20 text-secondary font-label-badge text-label-badge">100% ESCALADO</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+            Ao confirmar, o motor físico simulará o 1º Tempo segundo a postura escolhida. Não há prorrogação em caso de empate nos 90'.
+          </p>
+</div>
+</div>
+<!-- Massive Action Button with 3s Countdown Hook -->
+<div class="flex flex-col sm:flex-row items-center gap-space-md w-full md:w-auto">
+<div class="text-right hidden sm:block">
+<span class="font-telemetry-mono text-[10px] uppercase text-on-surface-variant block">CONFIRMAÇÃO AUTOMÁTICA EM</span>
+<span class="font-metric-lg text-metric-lg text-secondary-fixed font-bold leading-none" id="button-timer">03 SEG</span>
+</div>
+<button class="w-full sm:w-auto px-space-xl py-space-md rounded-lg bg-primary-container hover:bg-[#10b981] active:scale-98 transition-all duration-150 text-on-primary font-headline-sm text-[15px] font-black uppercase tracking-wider shadow-[0_0_24px_rgba(0,255,135,0.4)] flex items-center justify-center gap-space-sm group" id="start-match-btn" onclick="executeMatchStart()">
+<span>ROLAR A BOLA (QUARTAS DE FINAL)</span>
+<span class="material-symbols-outlined text-[22px] group-hover:translate-x-1 transition-transform">sports_soccer</span>
+</button>
+</div>
+</div>
+<!-- Match Rule Drawer Note -->
+<div class="mt-space-sm flex items-center justify-between text-on-surface-variant font-telemetry-mono text-[11px] px-space-xs">
+<span>REGRA CONMEBOL 7x0: CARTÃO VERMELHO RETIRA O ATLETA DAS PRÓXIMAS DUAS ETAPAS.</span>
+<span class="text-outline hover:text-primary cursor-pointer transition-colors">VER DETALHES DO REGULAMENTO →</span>
+</div>
+</div>
+</div>
+<script>
+  // Tactical Posture Selection Logic
+  function selectTactic(index) {
+    const cards = document.querySelectorAll('#tactics-selector .tactic-card');
+    cards.forEach((card, idx) => {
+      const radio = card.querySelector('.radio-indicator');
+      const textDesc = card.querySelector('p');
+      if (idx === index) {
+        card.classList.remove('bg-surface-container', 'hover:bg-surface-container-high');
+        card.classList.add('bg-surface-container-highest', 'shadow-[0_0_16px_rgba(0,255,135,0.15)]');
+        radio.classList.remove('bg-surface-bright', 'text-transparent');
+        radio.classList.add('bg-primary-container', 'text-on-primary-container', 'font-bold');
+        textDesc.classList.remove('text-on-surface-variant');
+        textDesc.classList.add('text-on-surface');
+      } else {
+        card.classList.remove('bg-surface-container-highest', 'shadow-[0_0_16px_rgba(0,255,135,0.15)]');
+        card.classList.add('bg-surface-container', 'hover:bg-surface-container-high');
+        radio.classList.remove('bg-primary-container', 'text-on-primary-container', 'font-bold');
+        radio.classList.add('bg-surface-bright', 'text-transparent');
+        textDesc.classList.remove('text-on-surface');
+        textDesc.classList.add('text-on-surface-variant');
+      }
+    });
+  }
+
+  // Tense 3-second auto-start countdown
+  let secondsRemaining = 3;
+  const chipElement = document.getElementById('countdown-chip');
+  const timerElement = document.getElementById('button-timer');
+  const startBtn = document.getElementById('start-match-btn');
+
+  const countdownInterval = setInterval(() => {
+    secondsRemaining--;
+    if (chipElement) chipElement.textContent = `00:0${secondsRemaining}`;
+    if (timerElement) timerElement.textContent = `0${secondsRemaining} SEG`;
+
+    if (secondsRemaining <= 0) {
+      clearInterval(countdownInterval);
+      if (chipElement) chipElement.textContent = 'PRONTO';
+      if (timerElement) timerElement.textContent = 'IMEDIATO';
+    }
+  }, 1000);
+
+  function executeMatchStart() {
+    clearInterval(countdownInterval);
+    startBtn.innerHTML = `
+      <span>ENTRANDO EM CAMPO...</span>
+      <span class="material-symbols-outlined animate-spin text-[20px]">sync</span>
+    `;
+    startBtn.classList.add('opacity-80', 'cursor-not-allowed');
+    setTimeout(() => {
+      // Direct user forward in simulation flow
+      window.location.hash = '#partida';
+    }, 450);
+  }
+</script></main><footer class="w-full bg-surface-container-lowest/90 backdrop-blur-md"><div class="max-w-[1200px] mx-auto px-margin py-space-sm flex flex-col md:flex-row items-center justify-between gap-space-sm text-on-surface-variant font-telemetry-mono text-telemetry-mono"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs"><span>ATALHOS:</span><kbd class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface">SPACE</kbd><span>Pausa/Play</span><kbd class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface">T</kbd><span>Táticas Rápidas</span><kbd class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface">ESC</kbd><span>Quadro Geral</span></div></div><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-xs cursor-pointer hover:text-on-surface transition-colors"><span class="material-symbols-outlined text-[16px]">volume_up</span><span>ÁUDIO CAMPO: ON</span></div><div class="flex items-center gap-space-xs text-outline"><span class="w-1.5 h-1.5 rounded-full bg-outline"></span><span>MATA-MATA SEM VOLTA</span></div></div></div></footer></body></html>
