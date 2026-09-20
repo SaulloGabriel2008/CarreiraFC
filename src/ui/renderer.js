@@ -338,3 +338,82 @@ export function showSeasonModal(seasonReport, progression, onContinueCallback) {
 
   modalContainer.classList.add('active');
 }
+
+/**
+ * Renderiza o Dilema Esportivo / Extracampo na tela #view-event
+ * @param {object} event Objeto do evento
+ * @param {Function} onChoiceCallback Callback chamado com o choiceId
+ */
+export function renderEventView(event, onChoiceCallback) {
+  const catEl = document.getElementById('event-category');
+  const titleEl = document.getElementById('event-title');
+  const descEl = document.getElementById('event-description');
+  const choicesContainer = document.getElementById('event-choices');
+
+  if (catEl) catEl.textContent = event.categoryName || "🎭 Dilema Futebolístico";
+  if (titleEl) titleEl.textContent = event.title;
+  if (descEl) descEl.textContent = event.description;
+
+  if (choicesContainer) {
+    choicesContainer.innerHTML = '';
+    event.choices.forEach(choice => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.innerHTML = `
+        <span class="choice-label">${choice.text}</span>
+        <span class="choice-risk">⚡ ${choice.riskLabel || 'Impacto Imediato'}</span>
+      `;
+      btn.onclick = () => {
+        if (onChoiceCallback) onChoiceCallback(choice.id);
+      };
+      choicesContainer.appendChild(btn);
+    });
+  }
+}
+
+/**
+ * Renderiza o desfecho dramático da escolha do evento
+ * @param {object} outcomeResult Resultado de EventEngine.processChoice()
+ * @param {Function} onContinueCallback Função chamada ao prosseguir
+ */
+export function renderEventOutcome(outcomeResult, onContinueCallback) {
+  const choicesContainer = document.getElementById('event-choices');
+  const descEl = document.getElementById('event-description');
+
+  if (!choicesContainer || !descEl) return;
+
+  const isSuccess = outcomeResult.isSuccess;
+  const changes = outcomeResult.changes;
+
+  // Monta badges de deltas de atributos
+  const badges = [];
+  if (changes.morale !== 0) badges.push(`<span class="badge ${changes.morale > 0 ? 'badge-green' : 'badge-red'}">Moral ${changes.morale > 0 ? '+' : ''}${changes.morale}</span>`);
+  if (changes.reputation !== 0) badges.push(`<span class="badge ${changes.reputation > 0 ? 'badge-gold' : 'badge-red'}">Reputação ${changes.reputation > 0 ? '+' : ''}${changes.reputation}</span>`);
+  if (changes.physical !== 0) badges.push(`<span class="badge ${changes.physical > 0 ? 'badge-green' : 'badge-red'}">Físico ${changes.physical > 0 ? '+' : ''}${changes.physical}</span>`);
+  if (changes.overall !== 0) badges.push(`<span class="badge ${changes.overall > 0 ? 'badge-gold' : 'badge-red'}">Overall ${changes.overall > 0 ? '+' : ''}${changes.overall}</span>`);
+  if (changes.money !== 0) badges.push(`<span class="badge badge-gold">Finanças ${changes.money > 0 ? '+' : ''}R$ ${Math.abs(changes.money)}</span>`);
+
+  descEl.innerHTML = `
+    <div style="font-size: 1.15rem; font-weight: 800; color: ${isSuccess ? 'var(--accent-green)' : 'var(--accent-red)'}; margin-bottom: 0.65rem;">
+      ${isSuccess ? '✅ SUCESSO ESPORTIVO!' : '⚠️ COMPLICAÇÕES GRAVES!'}
+    </div>
+    <p style="margin-bottom: 1rem; color: var(--text-main);">${outcomeResult.text}</p>
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      ${badges.join(' ')}
+    </div>
+  `;
+
+  choicesContainer.innerHTML = `
+    <button id="btn-event-continue" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;">
+      ⚽ Prosseguir com a Temporada ➡️
+    </button>
+  `;
+
+  const btnContinue = document.getElementById('btn-event-continue');
+  if (btnContinue) {
+    btnContinue.onclick = () => {
+      if (onContinueCallback) onContinueCallback();
+    };
+  }
+}
+

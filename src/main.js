@@ -6,16 +6,19 @@
 
 import { Player } from './modules/player.js';
 import { SeasonSimulator } from './modules/simulator.js';
+import { EventEngine } from './modules/eventEngine.js';
 import { getClubById } from './data/clubs.js';
-import { initCreationForm, renderDashboard, showSeasonModal } from './ui/renderer.js';
+import { initCreationForm, renderDashboard, showSeasonModal, renderEventView, renderEventOutcome } from './ui/renderer.js';
 
 // Estado Global Central da Aplicação
 export const gameState = {
   currentView: 'creation', // 'creation' | 'dashboard' | 'event' | 'retirement'
   currentYear: 2026,
   player: null,
+  recentEventIds: [],
   isAudioEnabled: true
 };
+
 
 // Disponibiliza o gameState no window para facilidade de depuração e testes
 if (typeof window !== 'undefined') {
@@ -103,16 +106,9 @@ export function handleStartCareer(creationParams) {
 }
 
 /**
- * Executa a simulação completa da temporada anual
+ * Executa a simulação esportiva propriamente dita após eventuais decisões tomadas
  */
-export function handleSimulateSeason() {
-  if (!gameState.player) return;
-
-  if (gameState.player.isRetired) {
-    showToast("Este atleta já encerrou a carreira profissional.", "danger");
-    return;
-  }
-
+export function executeSeasonSimulation() {
   const btnSimulate = document.getElementById('btn-simulate-season');
   if (btnSimulate) {
     btnSimulate.disabled = true;
@@ -157,6 +153,43 @@ export function handleSimulateSeason() {
     }
   }, 200);
 }
+
+/**
+ * Ponto de entrada ao clicar no botão "Simular Temporada" (Verifica eventos antes dos jogos)
+ */
+export function handleSimulateSeason() {
+  if (!gameState.player) return;
+
+  if (gameState.player.isRetired) {
+    showToast("Este atleta já encerrou a carreira profissional.", "danger");
+    return;
+  }
+
+  // 65% de chance de ocorrer um dilema crítico antes ou durante a temporada
+  const shouldTriggerEvent = Math.random() < 0.65;
+  const event = shouldTriggerEvent ? EventEngine.getEvent(gameState.player, gameState.recentEventIds) : null;
+
+  if (event) {
+    gameState.recentEventIds.push(event.id);
+    if (gameState.recentEventIds.length > 6) gameState.recentEventIds.shift();
+
+    // Alterna para tela do dilema
+    switchView('event');
+    renderEventView(event, (choiceId) => {
+      const outcome = EventEngine.processChoice(gameState.player, event, choiceId);
+      renderEventOutcome(outcome, () => {
+        // Ao clicar em prosseguir com a temporada
+        switchView('dashboard');
+        renderDashboard(gameState.player, gameState.currentYear);
+        executeSeasonSimulation();
+      });
+    });
+  } else {
+    // Simula diretamente
+    executeSeasonSimulation();
+  }
+}
+
 
 // Inicialização de Listeners e ciclo de vida
 document.addEventListener('DOMContentLoaded', () => {
