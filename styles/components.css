@@ -1,0 +1,465 @@
+/* ==========================================================================
+   CARREIRA FC - STYLES: COMPONENTS
+   Componentes Reutilizáveis (Botões, Cards, Badges, Modais, Tabelas, Toasts)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. BOTÕES
+   -------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.92rem;
+  padding: 0.7rem 1.25rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  line-height: 1.2;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-green-hover) 100%);
+  color: var(--text-inverse);
+  box-shadow: 0 4px 14px var(--accent-green-glow);
+}
+.btn-primary:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 6px 20px rgba(0, 230, 118, 0.4);
+}
+
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-medium);
+}
+.btn-secondary:hover {
+  background: var(--bg-card-hover);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-hover) 100%);
+  color: var(--text-inverse);
+  box-shadow: 0 4px 14px var(--accent-gold-glow);
+}
+.btn-gold:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 6px 22px rgba(255, 193, 7, 0.45);
+}
+
+.btn-danger {
+  background: var(--accent-red);
+  color: #ffffff;
+}
+.btn-danger:hover {
+  filter: brightness(1.15);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border-accent);
+  color: var(--accent-green);
+}
+.btn-outline:hover {
+  background: rgba(0, 230, 118, 0.1);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-sm {
+  padding: 0.45rem 0.85rem;
+  font-size: 0.8rem;
+  border-radius: var(--radius-xs);
+}
+
+.btn-lg {
+  padding: 0.95rem 1.75rem;
+  font-size: 1.05rem;
+  border-radius: var(--radius-md);
+}
+
+/* --------------------------------------------------------------------------
+   2. CARDS E PAINÉIS
+   -------------------------------------------------------------------------- */
+.card-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.card-panel:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.card-highlight {
+  background: linear-gradient(180deg, rgba(0, 230, 118, 0.06) 0%, var(--bg-card) 100%);
+  border-color: var(--border-accent);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+/* --------------------------------------------------------------------------
+   3. BADGES E TAGS
+   -------------------------------------------------------------------------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
+.badge-pos {
+  background: rgba(0, 180, 216, 0.15);
+  color: var(--accent-blue);
+  border-color: rgba(0, 180, 216, 0.3);
+}
+
+.badge-gold {
+  background: rgba(255, 193, 7, 0.15);
+  color: var(--accent-gold);
+  border-color: var(--border-gold);
+}
+
+.badge-green {
+  background: rgba(0, 230, 118, 0.15);
+  color: var(--accent-green);
+  border-color: var(--border-accent);
+}
+
+.badge-red {
+  background: rgba(255, 82, 82, 0.15);
+  color: var(--accent-red);
+  border-color: rgba(255, 82, 82, 0.3);
+}
+
+.badge-tier {
+  font-weight: 800;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-xs);
+}
+
+/* --------------------------------------------------------------------------
+   4. CAIXAS DE ESTATÍSTICA (STAT BOXES)
+   -------------------------------------------------------------------------- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.75rem;
+}
+
+.stat-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform var(--transition-fast);
+}
+
+.stat-box:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.stat-value {
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: var(--text-main);
+  line-height: 1.1;
+  margin-bottom: 0.2rem;
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.stat-box.stat-highlight .stat-value {
+  color: var(--accent-green);
+}
+
+.stat-box.stat-gold .stat-value {
+  color: var(--accent-gold);
+}
+
+/* --------------------------------------------------------------------------
+   5. BARRAS DE PROGRESSO
+   -------------------------------------------------------------------------- */
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progress-fill.fill-green {
+  background: linear-gradient(90deg, #00c853, var(--accent-green));
+  box-shadow: 0 0 10px var(--accent-green-glow);
+}
+
+.progress-fill.fill-gold {
+  background: linear-gradient(90deg, #ffb300, var(--accent-gold));
+  box-shadow: 0 0 10px var(--accent-gold-glow);
+}
+
+.progress-fill.fill-blue {
+  background: linear-gradient(90deg, #0096c7, var(--accent-blue));
+}
+
+.progress-fill.fill-red {
+  background: linear-gradient(90deg, #d32f2f, var(--accent-red));
+}
+
+/* --------------------------------------------------------------------------
+   6. FORMULÁRIOS E INPUTS
+   -------------------------------------------------------------------------- */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-input, .form-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-input:focus, .form-select:focus {
+  outline: none;
+  border-color: var(--accent-green);
+  box-shadow: 0 0 0 3px var(--accent-green-glow);
+}
+
+.form-select {
+  cursor: pointer;
+}
+
+.form-hint {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   7. TABELA DE DADOS
+   -------------------------------------------------------------------------- */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.data-table th, .data-table td {
+  padding: 0.7rem 0.85rem;
+  white-space: nowrap;
+}
+
+.data-table th {
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.data-table tr:not(:last-child) td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.data-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* --------------------------------------------------------------------------
+   8. MODAIS E NOTIFICAÇÕES (TOASTS)
+   -------------------------------------------------------------------------- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(5, 10, 7, 0.82);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-normal);
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal-dialog {
+  width: 100%;
+  max-width: 520px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-lg);
+  transform: scale(0.95);
+  transition: transform var(--transition-normal);
+}
+
+.modal-overlay.active .modal-dialog {
+  transform: scale(1);
+}
+
+/* Container de Toasts Flutuantes */
+#toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.toast {
+  padding: 0.75rem 1.15rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-medium);
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+  animation: slideInToast 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+  pointer-events: all;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.toast.toast-success {
+  border-color: var(--accent-green);
+  border-left-width: 4px;
+}
+
+.toast.toast-danger {
+  border-color: var(--accent-red);
+  border-left-width: 4px;
+}
+
+.toast.toast-gold {
+  border-color: var(--accent-gold);
+  border-left-width: 4px;
+}
+
+@keyframes slideInToast {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}

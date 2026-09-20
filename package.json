@@ -1,0 +1,12 @@
+{
+  "name": "carreira-fc",
+  "version": "1.0.0",
+  "description": "Simulador de carreira futebolística rápido e minimalista para navegador",
+  "type": "module",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "keywords": ["game", "football", "soccer", "simulation", "career"],
+  "author": "",
+  "license": "MIT"
+}
