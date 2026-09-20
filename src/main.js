@@ -1,16 +1,27 @@
 /**
- * CARREIRA FC - MAIN BOOTSTRAPPER & GAME STATE MANAGER
- * Orquestrador central: Inicializa o fluxo de criação, gerencia o ciclo anual das temporadas,
- * conecta o motor matemático ao dashboard e controla as transições entre views.
+ * CARREIRA FC - MAIN ORCHESTRATOR & GAME CONTROLLER
+ * Orquestrador do ciclo completo do jogo:
+ * Criação -> Pré-Temporada -> Dilemas -> Simulação -> Seleção -> Prêmios -> Mercado da Bola -> Aposentadoria & Saves
  */
 
 import { Player } from './modules/player.js';
 import { SeasonSimulator } from './modules/simulator.js';
 import { EventEngine } from './modules/eventEngine.js';
+import { TransferMarket } from './modules/transfer.js';
+import { AwardsManager } from './modules/awards.js';
+import { StorageService } from './modules/storage.js';
 import { getClubById } from './data/clubs.js';
-import { initCreationForm, renderDashboard, showSeasonModal, renderEventView, renderEventOutcome } from './ui/renderer.js';
+import {
+  initCreationForm,
+  renderDashboard,
+  showSeasonModal,
+  showTransferMarketModal,
+  renderEventView,
+  renderEventOutcome
+} from './ui/renderer.js';
+import { ShareCardRenderer } from './ui/shareCard.js';
 
-// Estado Global Central da Aplicação
+// Estado Global Central
 export const gameState = {
   currentView: 'creation', // 'creation' | 'dashboard' | 'event' | 'retirement'
   currentYear: 2026,
@@ -19,14 +30,13 @@ export const gameState = {
   isAudioEnabled: true
 };
 
-
-// Disponibiliza o gameState no window para facilidade de depuração e testes
+// Disponibiliza o gameState no escopo global para testes e depuração
 if (typeof window !== 'undefined') {
   window.gameState = gameState;
 }
 
 /**
- * Alterna a visualização entre as views principais com animação suave
+ * Alterna suavemente entre as telas principais
  * @param {'creation' | 'dashboard' | 'event' | 'retirement'} viewId 
  */
 export function switchView(viewId) {
@@ -52,12 +62,12 @@ export function switchView(viewId) {
 }
 
 /**
- * Emite uma notificação Toast rápida na tela
+ * Emite notificações Toast rápidas e visuais na tela
  * @param {string} message 
  * @param {'success' | 'danger' | 'gold'} type 
  * @param {number} durationMs 
  */
-export function showToast(message, type = 'success', durationMs = 3000) {
+export function showToast(message, type = 'success', durationMs = 3500) {
   const container = document.getElementById('toast-container');
   if (!container) return;
 
@@ -76,11 +86,10 @@ export function showToast(message, type = 'success', durationMs = 3000) {
 }
 
 /**
- * Manipulador de Inicialização da Carreira Profissional
- * @param {object} creationParams { name, nickname, position, archetype, currentClubId }
+ * Manipulador de Inicialização de uma Nova Carreira
+ * @param {object} creationParams 
  */
 export function handleStartCareer(creationParams) {
-  // 1. Instancia o atleta aos 17 anos com arquétipo e clube
   const player = new Player({
     name: creationParams.name,
     nickname: creationParams.nickname,
@@ -90,23 +99,24 @@ export function handleStartCareer(creationParams) {
     age: 17
   });
 
-  // 2. Atualiza estado global
   gameState.player = player;
   gameState.currentYear = 2026;
+  gameState.recentEventIds = [];
 
-  // 3. Renderiza o Dashboard inicial
+  // Salva no LocalStorage
+  StorageService.saveGame(gameState);
+
+  // Renderiza Dashboard e altera tela
   renderDashboard(gameState.player, gameState.currentYear);
-
-  // 4. Alterna para o Dashboard com efeito visual
   switchView('dashboard');
 
   const club = getClubById(player.currentClubId);
-  const clubName = club ? club.shortName || club.name : "clube de formação";
-  showToast(`Carreira iniciada no ${clubName}! Mostre seu valor, garoto!`, 'gold', 4000);
+  const clubName = club ? club.shortName || club.name : "clube formador";
+  showToast(`Carreira iniciada no ${clubName}! Boa sorte, garoto!`, 'gold', 4500);
 }
 
 /**
- * Executa a simulação esportiva propriamente dita após eventuais decisões tomadas
+ * Executa a simulação esportiva e o desfecho da temporada
  */
 export function executeSeasonSimulation() {
   const btnSimulate = document.getElementById('btn-simulate-season');
@@ -115,35 +125,79 @@ export function executeSeasonSimulation() {
     btnSimulate.innerHTML = `⚽ Simulando...`;
   }
 
-  // Pequeno delay sensorial (200ms) para dar sensação de processamento esportivo
   setTimeout(() => {
-    // 1. Simula os resultados esportivos pelo SeasonSimulator
-    const seasonReport = SeasonSimulator.simulateSeason(gameState.player, gameState.currentYear);
+    const player = gameState.player;
+    const year = gameState.currentYear;
 
-    // 2. Registra o histórico e atualiza acumuladores de carreira
-    gameState.player.addSeasonRecord(seasonReport);
+    // 1. Simulação das competições de clube
+    const seasonReport = SeasonSimulator.simulateSeason(player, year);
 
-    // 3. Aplica a curva etária anual (evolução juvenil ou declínio físico)
-    const progression = gameState.player.applyAgeProgression();
+    // 2. Avaliação de Seleção Nacional (Copa do Mundo / Copa América / Amistosos)
+    const nationalReport = AwardsManager.processNationalTeam(player, year);
+    if (nationalReport) {
+      if (nationalReport.wonTrophy) {
+        seasonReport.trophiesWon.push(nationalReport.wonTrophy);
+        showToast(`🌐 HISTÓRICO! Você conquistou a ${nationalReport.wonTrophy.name} com a Seleção!`, 'gold', 6000);
+      }
+    }
 
-    // 4. Notificações rápidas na tela
+    // 3. Avaliação de Prêmios Individuais (Bola de Ouro, Chuteira de Ouro, Craque)
+    const awardsWon = AwardsManager.evaluateIndividualAwards(player, seasonReport, year);
+    if (awardsWon.length > 0) {
+      const awardNames = awardsWon.map(a => `${a.emoji} ${a.name}`).join(' • ');
+      showToast(`⭐ CONSAGRAÇÃO! Prêmios conquistados: ${awardNames}!`, 'gold', 5500);
+    }
+    seasonReport.awardsWon = awardsWon;
+
+    // 4. Registra histórico acumulado na carreira do atleta
+    player.addSeasonRecord(seasonReport);
+
+    // 5. Aplica a curva etária anual (evolução juvenil ou declínio físico)
+    const progression = player.applyAgeProgression();
+
+    // 6. Alertas de títulos de clube
     if (seasonReport.trophiesWon.length > 0) {
       const trophyNames = seasonReport.trophiesWon.map(t => t.name).join(', ');
       showToast(`🏆 É CAMPEÃO! Você levantou a taça: ${trophyNames}!`, 'gold', 4500);
     } else {
-      showToast(`Temporada ${gameState.currentYear} concluída com ${seasonReport.goals} gols e ${seasonReport.assists} assistências!`, 'success', 3000);
+      showToast(`Temporada ${year} finalizada com ${seasonReport.goals} gols e ${seasonReport.assists} assistências!`, 'success', 3000);
     }
 
-    // 5. Exibe o Modal comemorativo detalhado com resumo das competições e evolução
-    showSeasonModal(seasonReport, progression, () => {
-      // Callback disparado ao clicar em "Continuar para [Próximo Ano]"
-      gameState.currentYear += 1;
-      renderDashboard(gameState.player, gameState.currentYear);
+    // Salva automaticamente o progresso
+    StorageService.saveGame(gameState);
 
-      // Se o jogador se aposentou por idade/desgaste físico
-      if (gameState.player.isRetired) {
-        showToast(`Aos ${gameState.player.age} anos, sua carreira nos gramados chegou ao fim!`, 'gold', 5000);
-        switchView('retirement');
+    // 7. Abre o Modal Festivo de Fim de Temporada
+    showSeasonModal(seasonReport, progression, () => {
+      // Checa se o atleta se aposentou por idade/desgaste
+      if (player.isRetired) {
+        handlePlayerRetirement();
+        return;
+      }
+
+      // 8. Abre a Janela de Transferências do Mercado da Bola
+      const marketData = TransferMarket.generateTransferOffers(player);
+      if (marketData.offers.length > 0) {
+        showTransferMarketModal(player, marketData, (decision) => {
+          if (decision.action === 'transfer') {
+            TransferMarket.acceptOffer(player, decision.offer);
+            showToast(`✍️ Negócio fechado! Você é o novo reforço do ${decision.offer.clubName}!`, 'gold', 4500);
+          } else if (decision.action === 'renew') {
+            TransferMarket.acceptOffer(player, decision.offer);
+            showToast(`🤝 Vínculo renovado com aumento salarial no ${decision.offer.clubName}!`, 'success', 4000);
+          } else {
+            showToast(`Você optou por permanecer focado no clube atual.`, 'success', 3000);
+          }
+
+          // Avança para o próximo ano
+          gameState.currentYear += 1;
+          StorageService.saveGame(gameState);
+          renderDashboard(player, gameState.currentYear);
+        });
+      } else {
+        // Se não houve ofertas, avança normalmente
+        gameState.currentYear += 1;
+        StorageService.saveGame(gameState);
+        renderDashboard(player, gameState.currentYear);
       }
     });
 
@@ -151,11 +205,11 @@ export function executeSeasonSimulation() {
       btnSimulate.disabled = false;
       btnSimulate.innerHTML = `⚽ Simular Temporada ${gameState.currentYear}`;
     }
-  }, 200);
+  }, 220);
 }
 
 /**
- * Ponto de entrada ao clicar no botão "Simular Temporada" (Verifica eventos antes dos jogos)
+ * Ponto de entrada ao clicar em "Simular Temporada" (Verifica eventos e dilemas de campo/extracampo)
  */
 export function handleSimulateSeason() {
   if (!gameState.player) return;
@@ -165,7 +219,7 @@ export function handleSimulateSeason() {
     return;
   }
 
-  // 65% de chance de ocorrer um dilema crítico antes ou durante a temporada
+  // 65% de chance de ocorrer um dilema crítico estilo 7 a 0
   const shouldTriggerEvent = Math.random() < 0.65;
   const event = shouldTriggerEvent ? EventEngine.getEvent(gameState.player, gameState.recentEventIds) : null;
 
@@ -173,32 +227,58 @@ export function handleSimulateSeason() {
     gameState.recentEventIds.push(event.id);
     if (gameState.recentEventIds.length > 6) gameState.recentEventIds.shift();
 
-    // Alterna para tela do dilema
     switchView('event');
     renderEventView(event, (choiceId) => {
       const outcome = EventEngine.processChoice(gameState.player, event, choiceId);
       renderEventOutcome(outcome, () => {
-        // Ao clicar em prosseguir com a temporada
         switchView('dashboard');
         renderDashboard(gameState.player, gameState.currentYear);
         executeSeasonSimulation();
       });
     });
   } else {
-    // Simula diretamente
     executeSeasonSimulation();
   }
 }
 
+/**
+ * Encaminha o atleta para a tela de glória e aposentadoria
+ */
+export function handlePlayerRetirement() {
+  if (!gameState.player) return;
 
-// Inicialização de Listeners e ciclo de vida
+  showToast(`Aos ${gameState.player.age} anos, sua trajetória nos gramados foi imortalizada!`, 'gold', 5000);
+  ShareCardRenderer.renderRetirementView(gameState.player);
+  switchView('retirement');
+  StorageService.clearSave(); // Limpa o save ativo após aposentadoria definitiva
+}
+
+// Inicialização Geral da Aplicação
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('⚽ Carreira FC: Inicializando motor de jogo [Prompt 6 Ativo].');
+  console.log('⚽ Carreira FC: Aplicação Pronta e Operacional [Full Pipeline Ativo].');
 
-  // Inicializa o formulário de criação com callbacks
+  // Inicializa o formulário de criação
   initCreationForm(handleStartCareer);
 
-  // Botão "Simular Temporada" conectado ao motor
+  // Checa se existe savegame salvo
+  const btnLoadSave = document.getElementById('btn-load-saved-career');
+  if (btnLoadSave && StorageService.hasActiveSave()) {
+    btnLoadSave.classList.remove('hidden');
+    btnLoadSave.onclick = () => {
+      const saved = StorageService.loadGame();
+      if (saved && saved.player) {
+        gameState.player = saved.player;
+        gameState.currentYear = saved.currentYear;
+        gameState.recentEventIds = saved.recentEventIds;
+
+        renderDashboard(gameState.player, gameState.currentYear);
+        switchView('dashboard');
+        showToast(`Carreira de ${gameState.player.name} restaurada com sucesso!`, 'gold', 3500);
+      }
+    };
+  }
+
+  // Botão "Simular Temporada"
   const btnSimulate = document.getElementById('btn-simulate-season');
   if (btnSimulate) {
     btnSimulate.addEventListener('click', handleSimulateSeason);
@@ -211,9 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!gameState.player || gameState.player.isRetired) return;
       if (confirm("Tem certeza que deseja pendurar as chuteiras e encerrar sua carreira agora?")) {
         gameState.player.retire("Aposentadoria voluntária do atleta.");
-        renderDashboard(gameState.player, gameState.currentYear);
-        showToast("Carreira encerrada! Confira seu legado final.", "gold", 3500);
-        switchView('retirement');
+        handlePlayerRetirement();
       }
     });
   }
@@ -228,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Botão de alternância de som / efeito
+  // Alternador de som / efeitos
   const btnSound = document.getElementById('btn-sound-toggle');
   if (btnSound) {
     btnSound.addEventListener('click', () => {

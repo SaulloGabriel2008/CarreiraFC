@@ -417,3 +417,92 @@ export function renderEventOutcome(outcomeResult, onContinueCallback) {
   }
 }
 
+/**
+ * Exibe a Janela de Transferências com propostas na mesa
+ * @param {Player} player 
+ * @param {object} marketData Retorno de TransferMarket.generateTransferOffers()
+ * @param {Function} onDecisionCallback Chamado com { action: 'transfer' | 'renew' | 'stay', offer?: object }
+ */
+export function showTransferMarketModal(player, marketData, onDecisionCallback) {
+  const modalContainer = document.getElementById('modal-container');
+  const modalTitle = document.getElementById('modal-title');
+  const modalBody = document.getElementById('modal-body');
+  const modalBtn = document.getElementById('modal-btn-confirm');
+
+  if (!modalContainer || !modalBody) return;
+
+  modalTitle.innerHTML = `💼 Janela de Transferências • Mercado da Bola`;
+
+  const offersHtml = marketData.offers.map((offer, idx) => `
+    <div class="card-panel" style="background: var(--bg-card); border-color: var(--border-medium); margin-bottom: 0.75rem; padding: 0.85rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <span style="font-size: 1.05rem; font-weight: 800;">${offer.emoji} ${offer.clubName} <small style="color: var(--text-muted); font-size: 0.75rem;">(${offer.country})</small></span>
+        <span class="badge badge-pos">${offer.squadRole}</span>
+      </div>
+      <div style="display: flex; gap: 1rem; font-size: 0.84rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+        <span>Salário: <b style="color: var(--accent-green);">${formatMoney(offer.wage)}/mês</b></span>
+        <span>Luvas: <b style="color: var(--accent-gold);">${formatMoney(offer.signingBonus)}</b></span>
+      </div>
+      <button class="btn btn-primary btn-sm btn-block btn-accept-transfer" data-offer-idx="${idx}">
+        ✍️ Assinar com ${offer.clubName}
+      </button>
+    </div>
+  `).join('');
+
+  modalBody.innerHTML = `
+    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+      <p style="font-size: 0.88rem; color: var(--text-secondary);">
+        Com base no seu Overall (<b>${player.overall}</b>) e reputação, surgiram propostas na mesa do seu empresário:
+      </p>
+      
+      <div style="max-height: 280px; overflow-y: auto; padding-right: 0.25rem;">
+        ${offersHtml || '<p style="font-style: italic; color: var(--text-muted);">Nenhum clube fez proposta formal nesta janela.</p>'}
+      </div>
+
+      <div style="border-top: 1px solid var(--border-subtle); padding-top: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem;">
+        <button id="btn-renew-contract" class="btn btn-gold btn-block">
+          🤝 Renovar com ${marketData.currentClubOffer.clubName} (${formatMoney(marketData.currentClubOffer.wage)}/mês)
+        </button>
+        <button id="btn-stay-current" class="btn btn-secondary btn-block btn-sm">
+          Recusar e cumprir contrato atual
+        </button>
+      </div>
+    </div>
+  `;
+
+  // Oculta o botão padrão do modal para usar os botões específicos
+  if (modalBtn) modalBtn.style.display = 'none';
+
+  // Listeners das ofertas
+  document.querySelectorAll('.btn-accept-transfer').forEach(btn => {
+    btn.onclick = () => {
+      const idx = parseInt(btn.getAttribute('data-offer-idx'), 10);
+      const chosenOffer = marketData.offers[idx];
+      modalContainer.classList.remove('active');
+      if (modalBtn) modalBtn.style.display = 'inline-flex';
+      if (onDecisionCallback) onDecisionCallback({ action: 'transfer', offer: chosenOffer });
+    };
+  });
+
+  const btnRenew = document.getElementById('btn-renew-contract');
+  if (btnRenew) {
+    btnRenew.onclick = () => {
+      modalContainer.classList.remove('active');
+      if (modalBtn) modalBtn.style.display = 'inline-flex';
+      if (onDecisionCallback) onDecisionCallback({ action: 'renew', offer: marketData.currentClubOffer });
+    };
+  }
+
+  const btnStay = document.getElementById('btn-stay-current');
+  if (btnStay) {
+    btnStay.onclick = () => {
+      modalContainer.classList.remove('active');
+      if (modalBtn) modalBtn.style.display = 'inline-flex';
+      if (onDecisionCallback) onDecisionCallback({ action: 'stay' });
+    };
+  }
+
+  modalContainer.classList.add('active');
+}
+
+
