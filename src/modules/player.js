@@ -65,7 +65,11 @@ export class Player {
       cleanSheets: 0,
       averageRating: 0.0,
       trophies: [],
-      individualAwards: []
+      individualAwards: [],
+      nationalCaps: 0,
+      nationalGoals: 0,
+      nationalAssists: 0,
+      nationalTrophies: []
     };
 
     // Histórico temporada a temporada
@@ -507,17 +511,24 @@ export class Player {
       if (this.hasPerk('casa_mae')) lifestyleScore += 80;
     }
 
-    const totalScore = Math.round(goalsScore + assistsScore + gamesScore + trophiesScore + awardsScore + peakBonus + lifestyleScore);
+    // Bônus de Seleção Nacional (Copa do Mundo e Copas Continentais)
+    const worldCupTrophy = this.careerStats.trophies.find(t => t.id === "copa_do_mundo");
+    const continentalTrophy = this.careerStats.trophies.find(t => ["copa_america", "eurocopa", "copa_ouro", "copa_asia"].includes(t.id));
+    let nationalBonus = 0;
+    if (worldCupTrophy) nationalBonus += 250;
+    if (continentalTrophy) nationalBonus += 120;
+
+    const totalScore = Math.round(goalsScore + assistsScore + gamesScore + trophiesScore + awardsScore + peakBonus + lifestyleScore + nationalBonus);
 
     let tier = "Promessa Inacabada";
     let legacyTitle = "Cigano da Bola";
 
     if (totalScore >= 1800) {
       tier = "LENDA HISTÓRICA DO FUTEBOL MUNDIAL";
-      legacyTitle = "O Deus da Bola";
+      legacyTitle = worldCupTrophy ? "Campeão Mundial & Deus da Bola" : "O Deus da Bola";
     } else if (totalScore >= 1200) {
       tier = "ÍDOLO CONSAGRADO NACIONAL";
-      legacyTitle = "Rei dos Clássicos";
+      legacyTitle = worldCupTrophy ? "Campeão do Mundo & Ídolo Eterno" : "Rei dos Clássicos";
     } else if (totalScore >= 750) {
       tier = "CRAQUE DE ALTO NÍVEL";
       legacyTitle = "Gênio Indiscutível";

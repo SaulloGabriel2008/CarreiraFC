@@ -43,8 +43,8 @@
           </div>
 
           <form id="form-create-player" onsubmit="event.preventDefault();">
-            <!-- Nome e Apelido -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <!-- Nome, Apelido e Nacionalidade -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
               <div class="form-group">
                 <label class="form-label" for="player-name">Nome do Jogador</label>
                 <input type="text" id="player-name" class="form-input" placeholder="Ex: Saulo" maxlength="24" required>
@@ -52,6 +52,10 @@
               <div class="form-group">
                 <label class="form-label" for="player-nickname">Apelido de Cria (Opcional)</label>
                 <input type="text" id="player-nickname" class="form-input" placeholder="Ex: O Bruxo, Artilheiro" maxlength="20">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="player-nationality">Nacionalidade / Pátria</label>
+                <select id="player-nationality" class="form-select"></select>
               </div>
             </div>
 
@@ -161,32 +165,35 @@
       </section>
 
       <!-- VIEW 2: DASHBOARD DA TEMPORADA -->
-      <section id="view-dashboard" class="view hidden">
-        <!-- Banner do Atleta -->
-        <div class="player-banner">
-          <div class="player-identity">
-            <div class="player-avatar" id="dash-avatar">⚡</div>
-            <div class="player-details">
-              <h2 id="dash-player-name">Saulo <span id="dash-nickname" style="color: var(--accent-green); font-size: 1rem;">"O Bruxo"</span></h2>
-              <div class="player-meta">
-                <span id="dash-pos-badge" class="badge badge-pos">ATA</span>
-                <span class="club-badge-display">🛡️ <span id="dash-club-name">Santos FC</span></span>
-                <span>• Idade: <b id="dash-age">17 anos</b></span>
-              </div>
-            </div>
+      <section id="view-dashboard" class="view hidden" aria-label="Painel Principal da Temporada">
+        <!-- Banner & Card do Atleta (FUT Style + Atributos 3D) -->
+        <div class="player-banner-layout">
+          <!-- Card Colecionável FUT com Molduras Dinâmicas e Badges -->
+          <div id="dash-fut-card-container">
+            <!-- Injetado dinamicamente via renderer.js -->
           </div>
-          <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-            <div class="stat-box stat-highlight" style="min-width: 80px;">
-              <div class="stat-value" id="dash-overall">68</div>
-              <div class="stat-label">Overall</div>
+
+          <!-- Painel de Informações e Grid de Atributos 3D -->
+          <div class="player-overview-panel">
+            <div class="player-overview-header">
+              <div>
+                <h2 id="dash-player-name">Saulo</h2>
+                <div class="player-meta" style="margin-top: 0.35rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                  <span id="dash-pos-badge" class="badge badge-pos">ATA</span>
+                  <span id="dash-nationality-badge" class="badge">🇧🇷 Brasil</span>
+                  <span class="club-badge-display" id="dash-club-display">
+                    <span id="dash-club-badge-slot"></span>
+                    <span id="dash-club-name">Santos FC</span>
+                  </span>
+                  <span>• Idade: <b id="dash-age">17 anos</b></span>
+                </div>
+              </div>
+              <span id="dash-card-tier-badge" class="badge badge-gold">Ouro Prime</span>
             </div>
-            <div class="stat-box" style="min-width: 80px;">
-              <div class="stat-value" id="dash-physical">85</div>
-              <div class="stat-label">Físico</div>
-            </div>
-            <div class="stat-box" style="min-width: 105px; border-color: rgba(255, 193, 7, 0.45); background: rgba(255, 193, 7, 0.05);">
-              <div class="stat-value" id="dash-finances" style="color: var(--accent-gold); font-size: 1.05rem;">R$ 35 mil</div>
-              <div class="stat-label" style="color: var(--accent-gold);">💰 Carteira</div>
+
+            <!-- Grid de Chips de Estatísticas com Ícones 3D -->
+            <div class="stat-chips-grid" id="dash-stat-chips-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.75rem; margin-top: 1rem;">
+              <!-- Injetado dinamicamente: Físico, Moral, Reputação, Carteira, Potencial -->
             </div>
           </div>
         </div>
@@ -200,28 +207,38 @@
             </span>
           </div>
           <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <button id="btn-open-lifestyle" class="btn btn-gold btn-md" title="Gerenciar Estilo de Vida, Staff e Investimentos">
+            <button id="btn-open-lifestyle" class="btn btn-gold btn-md" title="Gerenciar Estilo de Vida, Staff e Investimentos" aria-label="Abrir menu Vida e Fortuna">
               💎 Vida & Fortuna
             </button>
-            <button id="btn-simulate-season" class="btn btn-primary btn-lg">
+            <button id="btn-simulate-season" class="btn btn-primary btn-lg" aria-label="Simular Temporada">
               ⚽ Simular Temporada
             </button>
-            <button id="btn-retire-early" class="btn btn-secondary btn-sm" title="Encerrar Carreira">
+            <button id="btn-retire-early" class="btn btn-secondary btn-sm" title="Encerrar Carreira" aria-label="Encerrar carreira precocemente">
               Pendurar Chuteiras
             </button>
           </div>
         </div>
 
-        <!-- Vitrine de Troféus Acumulados -->
+        <!-- Vitrine de Troféus Acumulados & Glória -->
         <div class="card-panel" style="margin-bottom: 1.25rem;">
           <div class="card-header">
-            <span class="card-title">🏆 Sala de Troféus</span>
+            <span class="card-title">🏆 Sala de Troféus & Glória</span>
             <span class="badge badge-gold" id="dash-trophies-count">0 Títulos</span>
           </div>
-          <div class="trophy-case" id="dash-trophy-case">
-            <span style="font-size: 0.82rem; color: var(--text-muted); font-style: italic;">
+          <div class="trophy-shelf-grid" id="dash-trophy-case">
+            <span style="font-size: 0.82rem; color: var(--text-muted); font-style: italic; padding: 0.5rem;">
               Nenhum troféu conquistado ainda. Busque sua primeira taça!
             </span>
+          </div>
+
+          <!-- Prêmios Individuais (Bola de Ouro, Chuteira, Luva, etc.) -->
+          <div id="dash-awards-section" style="margin-top: 1rem; border-top: 1px solid var(--border-subtle); padding-top: 0.75rem; display: none;">
+            <div style="font-size: 0.82rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">
+              ✨ Prêmios Individuais & Honrarias
+            </div>
+            <div class="awards-shelf-grid" id="dash-awards-grid">
+              <!-- Injetado dinamicamente -->
+            </div>
           </div>
         </div>
 
@@ -232,17 +249,17 @@
             <span class="badge" id="dash-career-totals">0 J | 0 G | 0 A</span>
           </div>
           <div class="table-responsive">
-            <table class="data-table">
+            <table class="data-table" aria-label="Tabela de histórico de temporadas disputadas">
               <thead>
                 <tr>
-                  <th>Ano</th>
-                  <th>Idade</th>
-                  <th>Clube</th>
-                  <th>Jogos</th>
-                  <th>Gols</th>
-                  <th>Assists</th>
-                  <th>Nota</th>
-                  <th>Títulos</th>
+                  <th scope="col">Ano</th>
+                  <th scope="col">Idade</th>
+                  <th scope="col">Clube</th>
+                  <th scope="col">Jogos</th>
+                  <th scope="col">Gols</th>
+                  <th scope="col">Assists</th>
+                  <th scope="col">Nota</th>
+                  <th scope="col">Títulos</th>
                 </tr>
               </thead>
               <tbody id="dash-history-tbody">
@@ -258,17 +275,20 @@
       </section>
 
       <!-- VIEW 3: DILEMAS & EVENTOS (MODAL OU TELA) -->
-      <section id="view-event" class="view hidden">
-        <div class="card-panel event-card">
-          <div class="event-category-badge">
-            <span class="badge badge-gold" id="event-category">🎭 Dilema Extracampo</span>
-          </div>
-          <h2 class="event-question" id="event-title">Camarote no Carnaval antes do Clássico</h2>
-          <p class="event-narrative" id="event-description">
-            Você foi convidado para o camarote mais concorrido da Sapucaí a 48 horas do clássico decisivo. A imprensa está de olho e a torcida já desconfia. O que você faz?
-          </p>
-          <div class="event-choices-grid" id="event-choices">
-            <!-- Botões de Escolha injetados dinamicamente -->
+      <section id="view-event" class="view hidden" aria-label="Tela de Dilema Esportivo">
+        <div class="card-panel event-card" style="padding-top: 0; overflow: hidden;">
+          <div id="event-hero-banner-container"></div>
+          <div style="padding: 1.25rem 1.25rem 0.5rem;">
+            <div class="event-category-badge">
+              <span class="badge badge-gold" id="event-category">🎭 Dilema Extracampo</span>
+            </div>
+            <h2 class="event-question" id="event-title">Camarote no Carnaval antes do Clássico</h2>
+            <p class="event-narrative" id="event-description">
+              Você foi convidado para o camarote mais concorrido da Sapucaí a 48 horas do clássico decisivo. A imprensa está de olho e a torcida já desconfia. O que você faz?
+            </p>
+            <div class="event-choices-grid" id="event-choices">
+              <!-- Botões de Escolha injetados dinamicamente -->
+            </div>
           </div>
         </div>
       </section>

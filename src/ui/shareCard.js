@@ -6,6 +6,7 @@
 
 import { formatMoney } from './renderer.js';
 import { getLifestyleItemById } from '../data/lifestyle.js';
+import { AssetManager } from '../modules/assetManager.js';
 
 export class ShareCardRenderer {
   /**
@@ -54,8 +55,9 @@ export class ShareCardRenderer {
       // Prêmios individuais
       if (player.careerStats.individualAwards.length > 0) {
         const awardsHtml = player.careerStats.individualAwards.map(a => `
-          <span class="trophy-item" style="background: rgba(255, 193, 7, 0.2); border-color: var(--accent-gold);">
-            ${a.emoji || '⭐'} ${a.name} (${a.year})
+          <span class="trophy-item" style="background: rgba(255, 193, 7, 0.2); border-color: var(--accent-gold); display: inline-flex; align-items: center; gap: 0.35rem;">
+            <img src="${AssetManager.getAwardImage(a.id)}" style="width: 20px; height: 20px; object-fit: contain;" alt="" />
+            <span>${a.name} (${a.year})</span>
           </span>
         `).join('');
 

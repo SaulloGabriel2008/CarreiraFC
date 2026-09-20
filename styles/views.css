@@ -251,6 +251,40 @@
 /* --------------------------------------------------------------------------
    2. VIEW: DASHBOARD DA CARREIRA (#view-dashboard)
    -------------------------------------------------------------------------- */
+.player-banner-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+  align-items: stretch;
+}
+
+@media (max-width: 820px) {
+  .player-banner-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.player-overview-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-card) 100%);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: 1.35rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.player-overview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
 .player-banner {
   background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-card) 100%);
   border: 1px solid var(--border-subtle);

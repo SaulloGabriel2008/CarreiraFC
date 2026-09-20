@@ -78,10 +78,31 @@ body {
   display: flex;
   flex-direction: column;
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(0, 230, 118, 0.08) 0%, transparent 60%),
-    radial-gradient(circle at 100% 100%, rgba(255, 193, 7, 0.04) 0%, transparent 50%);
+    radial-gradient(circle at 50% 10%, rgba(0, 230, 118, 0.12) 0%, transparent 65%),
+    linear-gradient(180deg, rgba(8, 14, 10, 0.82) 0%, rgba(10, 17, 13, 0.94) 100%),
+    url('../assets/images/backgrounds/bg_stadium_night.webp');
+  background-size: auto, auto, cover;
+  background-position: center top;
+  background-repeat: no-repeat;
   background-attachment: fixed;
   overflow-x: hidden;
+}
+
+/* Acessibilidade: Navegação por Teclado e Foco Visível */
+:focus-visible {
+  outline: 2px solid var(--accent-green) !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 14px var(--accent-green-glow) !important;
+}
+
+/* Acessibilidade: Respeito à Sensibilidade de Movimento */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Tipografia */

@@ -7,6 +7,7 @@
 import { POSITIONS, getArchetypesByPosition, getArchetypeById } from '../data/archetypes.js';
 import { getRandomStartingClubs, getClubById } from '../data/clubs.js';
 import { LIFESTYLE_CATEGORIES, LIFESTYLE_ITEMS, getItemsByCategory, getLifestyleItemById } from '../data/lifestyle.js';
+import { AssetManager } from '../modules/assetManager.js';
 
 /**
  * Formata valores monetários no padrão brasileiro amigável (R$ mil / R$ mi)
@@ -49,16 +50,27 @@ export function initCreationForm(onStartCareerCallback) {
       const card = document.createElement('div');
       card.className = `starting-club-card ${index === 0 ? 'selected' : ''}`;
       card.setAttribute('data-club-id', club.id);
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', `Selecionar clube formador ${club.name}, Tier ${club.tier}`);
       card.innerHTML = `
-        <span class="starting-club-emoji">${club.emoji}</span>
+        <div style="margin-bottom: 0.25rem;">${AssetManager.renderClubBadgeHtml(club, 42)}</div>
         <span class="starting-club-name">${club.shortName || club.name}</span>
         <span class="starting-club-sub">Tier ${club.tier} &bull; Base 65 OVR</span>
       `;
 
-      card.onclick = () => {
+      const selectClub = () => {
         document.querySelectorAll('.starting-club-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         clubHiddenInput.value = club.id;
+      };
+
+      card.onclick = selectClub;
+      card.onkeydown = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          selectClub();
+        }
       };
 
       clubsGrid.appendChild(card);
@@ -175,42 +187,128 @@ export function renderDashboard(player, currentYear = 2026) {
   if (headerYearBadge) headerYearBadge.classList.remove('hidden');
   if (headerYear) headerYear.textContent = currentYear;
 
-  // 2. Banner do Atleta
-  const avatarEl = document.getElementById('dash-avatar');
+  // 2. Banner & Card FUT do Atleta
   const nameEl = document.getElementById('dash-player-name');
   const posBadge = document.getElementById('dash-pos-badge');
   const clubNameEl = document.getElementById('dash-club-name');
+  const clubBadgeSlot = document.getElementById('dash-club-badge-slot');
   const ageEl = document.getElementById('dash-age');
-  const overallEl = document.getElementById('dash-overall');
-  const physicalEl = document.getElementById('dash-physical');
   const tournamentBadge = document.getElementById('dash-tournament-badge');
   const btnSimulate = document.getElementById('btn-simulate-season');
+  const tierBadge = document.getElementById('dash-card-tier-badge');
+  const futCardContainer = document.getElementById('dash-fut-card-container');
+  const statChipsGrid = document.getElementById('dash-stat-chips-grid');
 
-  if (avatarEl) avatarEl.textContent = positionInfo.icon;
   if (nameEl) {
     const nickHtml = player.nickname ? ` <span id="dash-nickname" style="color: var(--accent-green); font-size: 1rem;">"${player.nickname}"</span>` : "";
     nameEl.innerHTML = `${player.name}${nickHtml}`;
   }
   if (posBadge) {
-    posBadge.textContent = player.position;
+    posBadge.textContent = `${positionInfo.icon} ${player.position}`;
+  }
+  if (clubBadgeSlot) {
+    clubBadgeSlot.innerHTML = AssetManager.renderClubBadgeHtml(club, 24);
   }
   if (clubNameEl) {
-    clubNameEl.textContent = `${club.emoji} ${club.shortName || club.name}`;
+    clubNameEl.textContent = `${club.shortName || club.name}`;
   }
   if (ageEl) {
-    ageEl.innerHTML = `${player.age} anos • <span style="color: var(--accent-green);">${formatMoney(player.marketValue)}</span>`;
+    ageEl.innerHTML = `${player.age} anos • <span style="color: var(--accent-green); font-weight: 700;">${formatMoney(player.marketValue)}</span>`;
   }
-  if (overallEl) {
-    overallEl.textContent = player.overall;
-  }
-  if (physicalEl) {
-    physicalEl.textContent = player.physical;
+  if (tierBadge) {
+    tierBadge.textContent = AssetManager.getCardTierName(player.overall);
+    tierBadge.className = `badge ${player.overall >= 85 ? 'badge-green' : player.overall >= 75 ? 'badge-gold' : 'badge-pos'}`;
   }
 
-  // Atualiza saldo na carteira
-  const financesEl = document.getElementById('dash-finances');
-  if (financesEl) {
-    financesEl.textContent = formatMoney(player.finances);
+  // Renderiza o Card Colecionável FUT (Ultimate Team Style)
+  if (futCardContainer) {
+    const cardFrame = AssetManager.getCardFrame(player.overall);
+    const tierClass = AssetManager.getCardTierClass(player.overall);
+    const archBadge = AssetManager.getArchetypeBadge(player.archetype);
+    const archBadgeHtml = archBadge ? `<div class="fut-card-archetype-badge" title="Arquétipo: ${player.archetype}"><img src="${archBadge}" alt="Arquétipo" /></div>` : '';
+    const clubCrestHtml = AssetManager.renderClubBadgeHtml(club, 24);
+
+    futCardContainer.innerHTML = `
+      <div class="fut-player-card ${tierClass}">
+        <img src="${cardFrame}" alt="Moldura do Card" class="fut-card-frame-bg" />
+        <div class="fut-card-inner">
+          <div class="fut-card-top">
+            <div class="fut-card-rating-block">
+              <span class="fut-card-ovr">${player.overall}</span>
+              <span class="fut-card-pos">${player.position}</span>
+            </div>
+            ${archBadgeHtml}
+          </div>
+
+          <div class="fut-card-avatar-area">
+            <div class="fut-card-avatar-circle">
+              ${positionInfo.icon}
+            </div>
+          </div>
+
+          <div class="fut-card-name">${player.name}</div>
+          ${player.nickname ? `<div class="fut-card-nickname">"${player.nickname}"</div>` : ''}
+
+          <div class="fut-card-club-row">
+            ${clubCrestHtml}
+            <span style="font-size: 0.8rem; font-weight: 800; color: var(--text-main);">${club.shortName || club.name}</span>
+          </div>
+
+          <div class="fut-card-stats-row">
+            <div class="fut-mini-stat">
+              <span class="fut-mini-stat-val" style="color: var(--accent-green);">${player.physical}</span>
+              <span class="fut-mini-stat-lbl">FÍSICO</span>
+            </div>
+            <div class="fut-mini-stat">
+              <span class="fut-mini-stat-val" style="color: var(--accent-blue);">${player.careerStats.totalGoals}</span>
+              <span class="fut-mini-stat-lbl">GOLS</span>
+            </div>
+            <div class="fut-mini-stat">
+              <span class="fut-mini-stat-val" style="color: var(--accent-gold);">${player.careerStats.trophies.length}</span>
+              <span class="fut-mini-stat-lbl">TÍTULOS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Renderiza Grid de Chips de Estatísticas com Sprites 3D
+  if (statChipsGrid) {
+    const moraleColor = player.morale >= 70 ? 'var(--accent-green)' : player.morale <= 35 ? 'var(--accent-red)' : 'var(--accent-gold)';
+    statChipsGrid.innerHTML = `
+      <div class="stat-chip-3d" title="Condição Física Atual">
+        <img src="${AssetManager.getUiIcon('physical')}" alt="Físico" class="stat-chip-icon-img" />
+        <div class="stat-chip-info">
+          <span class="stat-chip-value" style="color: var(--accent-green);">${player.physical}</span>
+          <span class="stat-chip-label">Condição Física</span>
+        </div>
+      </div>
+
+      <div class="stat-chip-3d" title="Nível de Moral e Motivação">
+        <img src="${AssetManager.getUiIcon('morale')}" alt="Moral" class="stat-chip-icon-img" />
+        <div class="stat-chip-info">
+          <span class="stat-chip-value" style="color: ${moraleColor};">${player.morale}%</span>
+          <span class="stat-chip-label">Moral / Foco</span>
+        </div>
+      </div>
+
+      <div class="stat-chip-3d" title="Reputação e Prestígio Nacional">
+        <img src="${AssetManager.getUiIcon('reputation')}" alt="Reputação" class="stat-chip-icon-img" />
+        <div class="stat-chip-info">
+          <span class="stat-chip-value" style="color: var(--accent-gold);">${player.reputation}</span>
+          <span class="stat-chip-label">Reputação / Fama</span>
+        </div>
+      </div>
+
+      <div class="stat-chip-3d" title="Saldo Financeiro em Conta">
+        <img src="${AssetManager.getUiIcon('money')}" alt="Carteira" class="stat-chip-icon-img" />
+        <div class="stat-chip-info">
+          <span class="stat-chip-value" style="color: var(--accent-gold);">${formatMoney(player.finances)}</span>
+          <span class="stat-chip-label">Saldo Bancário</span>
+        </div>
+      </div>
+    `;
   }
 
   if (tournamentBadge) {
@@ -228,7 +326,7 @@ export function renderDashboard(player, currentYear = 2026) {
     };
   }
 
-  // 3. Sala de Troféus
+  // 3. Sala de Troféus 3D
   const trophyCaseEl = document.getElementById('dash-trophy-case');
   const trophyCountEl = document.getElementById('dash-trophies-count');
 
@@ -240,22 +338,68 @@ export function renderDashboard(player, currentYear = 2026) {
   if (trophyCaseEl) {
     if (player.careerStats.trophies.length === 0) {
       trophyCaseEl.innerHTML = `
-        <span style="font-size: 0.82rem; color: var(--text-muted); font-style: italic;">
+        <span style="font-size: 0.85rem; color: var(--text-muted); font-style: italic; padding: 0.75rem;">
           Nenhum troféu conquistado ainda. Entre em campo e busque sua primeira taça!
         </span>
       `;
     } else {
       trophyCaseEl.innerHTML = '';
+      // Agrupa troféus por nome/id para exibir contadores limpos (ex: 3x Paulistão)
+      const trophyMap = new Map();
       player.careerStats.trophies.forEach(t => {
-        const item = document.createElement('span');
-        item.className = 'trophy-item';
-        item.innerHTML = `🏆 ${t.name} <small>(${t.year})</small>`;
-        trophyCaseEl.appendChild(item);
+        const key = t.id || t.name;
+        if (!trophyMap.has(key)) {
+          trophyMap.set(key, { ...t, count: 1, years: [t.year] });
+        } else {
+          const existing = trophyMap.get(key);
+          existing.count += 1;
+          existing.years.push(t.year);
+        }
+      });
+
+      trophyMap.forEach(t => {
+        const card = document.createElement('div');
+        card.className = 'trophy-shelf-card';
+        const trophyImgUrl = AssetManager.getTrophyImage(t.id);
+        const countBadge = t.count > 1 ? `<span class="trophy-shelf-count">${t.count}x</span>` : '';
+        const yearsStr = t.years.length > 2 ? `${t.years[0]}...${t.years[t.years.length - 1]}` : t.years.join(', ');
+
+        card.innerHTML = `
+          ${countBadge}
+          <img src="${trophyImgUrl}" alt="${t.name}" class="trophy-shelf-img" loading="lazy" />
+          <span class="trophy-shelf-name">${t.name}</span>
+          <span class="trophy-shelf-year">${yearsStr}</span>
+        `;
+        trophyCaseEl.appendChild(card);
       });
     }
   }
 
-  // 4. Totais de Carreira
+  // 4. Galeria de Prêmios Individuais (Bola de Ouro, Chuteira, etc.)
+  const awardsSection = document.getElementById('dash-awards-section');
+  const awardsGrid = document.getElementById('dash-awards-grid');
+  if (awardsSection && awardsGrid) {
+    const awards = player.careerStats.individualAwards || [];
+    if (awards.length > 0) {
+      awardsSection.style.display = 'block';
+      awardsGrid.innerHTML = '';
+      awards.forEach(a => {
+        const card = document.createElement('div');
+        card.className = 'award-card-3d';
+        const awardImg = AssetManager.getAwardImage(a.id);
+        card.innerHTML = `
+          <img src="${awardImg}" alt="${a.name}" class="award-card-img" loading="lazy" />
+          <span class="award-card-name">${a.name}</span>
+          <span class="award-card-year">${a.year}</span>
+        `;
+        awardsGrid.appendChild(card);
+      });
+    } else {
+      awardsSection.style.display = 'none';
+    }
+  }
+
+  // 5. Totais de Carreira
   const careerTotalsEl = document.getElementById('dash-career-totals');
   if (careerTotalsEl) {
     careerTotalsEl.textContent = `${player.careerStats.totalGames} J | ${player.careerStats.totalGoals} G | ${player.careerStats.totalAssists} A | Nota: ${player.careerStats.averageRating || '0.0'}`;
@@ -508,14 +652,19 @@ export function showSeasonModal(seasonReport, progression, onContinueCallback) {
   modalTitle.innerHTML = `🏁 Fim da Temporada ${seasonReport.year} • ${seasonReport.clubName}`;
 
   // Monta lista de competições disputadas
-  const compsHtml = seasonReport.competitionsSummary.map(comp => `
-    <div class="comp-item ${comp.won ? 'comp-champion' : ''}">
-      <span>${comp.won ? '🏆' : '⚽'} <b>${comp.name}</b> (${comp.stageReached})</span>
-      <span style="font-size: 0.8rem; color: var(--text-secondary);">
-        ${comp.playerGames}J | ${comp.playerGoals}G | ${comp.playerAssists}A • <b style="color: var(--accent-gold);">${comp.rating}</b>
-      </span>
-    </div>
-  `).join('');
+  const compsHtml = seasonReport.competitionsSummary.map(comp => {
+    const trophyImg = comp.won 
+      ? `<img src="${AssetManager.getTrophyImage(comp.id)}" style="width: 22px; height: 22px; vertical-align: middle; margin-right: 6px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));" alt="Taça" />` 
+      : '<span style="margin-right: 4px;">⚽</span>';
+    return `
+      <div class="comp-item ${comp.won ? 'comp-champion' : ''}">
+        <span style="display: flex; align-items: center;">${trophyImg}<b>${comp.name}</b>&nbsp;(${comp.stageReached})</span>
+        <span style="font-size: 0.8rem; color: var(--text-secondary);">
+          ${comp.playerGames}J | ${comp.playerGoals}G | ${comp.playerAssists}A • <b style="color: var(--accent-gold);">${comp.rating}</b>
+        </span>
+      </div>
+    `;
+  }).join('');
 
   // Mensagem de evolução etária
   const ovrSign = progression.overallDelta >= 0 ? `+${progression.overallDelta}` : `${progression.overallDelta}`;
@@ -606,6 +755,21 @@ export function renderEventView(event, onChoiceCallback) {
   const titleEl = document.getElementById('event-title');
   const descEl = document.getElementById('event-description');
   const choicesContainer = document.getElementById('event-choices');
+  const bannerContainer = document.getElementById('event-hero-banner-container');
+
+  if (bannerContainer) {
+    const bannerUrl = AssetManager.getEventBanner(event.id);
+    if (bannerUrl) {
+      bannerContainer.innerHTML = `
+        <div class="event-hero-banner">
+          <img src="${bannerUrl}" alt="" class="event-hero-img" />
+          <div class="event-hero-overlay"></div>
+        </div>
+      `;
+    } else {
+      bannerContainer.innerHTML = '';
+    }
+  }
 
   if (catEl) catEl.textContent = event.categoryName || "🎭 Dilema Futebolístico";
   if (titleEl) titleEl.textContent = event.title;
@@ -616,7 +780,7 @@ export function renderEventView(event, onChoiceCallback) {
     event.choices.forEach(choice => {
       const choiceCard = document.createElement('div');
       choiceCard.className = 'card-panel';
-      choiceCard.style.cssText = 'background: var(--bg-surface); border: 1px solid var(--border-medium); margin-bottom: 0.85rem; padding: 1rem; border-radius: var(--radius-sm);';
+      choiceCard.style.cssText = 'background: var(--bg-surface); border: 1px solid var(--border-medium); margin-bottom: 0.85rem; padding: 1.15rem; border-radius: var(--radius-sm);';
 
       // Monta badges de Ganhos Base
       const gainBadges = [];
@@ -645,24 +809,26 @@ export function renderEventView(event, onChoiceCallback) {
           <div style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.3rem;">
             ${choice.text}
           </div>
-          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem; line-height: 1.5;">
             ${choice.desc}
           </div>
           
-          <div style="display: flex; flex-direction: column; gap: 0.35rem; background: rgba(0,0,0,0.3); padding: 0.65rem; border-radius: var(--radius-xs); margin-bottom: 0.75rem; border: 1px dashed var(--border-subtle);">
+          <div style="display: flex; flex-direction: column; gap: 0.35rem; background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: var(--radius-xs); margin-bottom: 0.85rem; border: 1px dashed var(--border-subtle);">
             ${gainsHtml}
             ${lossesHtml}
-            <div style="font-size: 0.78rem; color: var(--accent-gold); margin-top: 0.2rem;">
+            <div style="font-size: 0.8rem; color: var(--accent-gold); margin-top: 0.25rem;">
               🎲 <b>Sorteio Opcional:</b> ${choice.gamble.gambleLabel}
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
-            <button class="btn btn-secondary btn-sm btn-choice-guaranteed" style="border-color: var(--accent-green);">
-              🛡️ Ir no Garantido (100% Certo)
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem;">
+            <button class="btn btn-guaranteed-styled btn-sm btn-choice-guaranteed" aria-label="Ir no garantido com certeza de resultado">
+              <img src="${AssetManager.getUiIcon('guaranteed')}" class="btn-action-icon" alt="" />
+              <span>Ir no Garantido</span>
             </button>
-            <button class="btn btn-gold btn-sm btn-choice-gamble">
-              🎲 Arriscar no Sorteio!
+            <button class="btn btn-gamble-styled btn-sm btn-choice-gamble" aria-label="Arriscar no sorteio por ganhos maiores">
+              <img src="${AssetManager.getUiIcon('gamble')}" class="btn-action-icon" alt="" />
+              <span>Arriscar no Sorteio!</span>
             </button>
           </div>
         `;
@@ -680,16 +846,16 @@ export function renderEventView(event, onChoiceCallback) {
           <div style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.3rem;">
             ${choice.text}
           </div>
-          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem; line-height: 1.5;">
             ${choice.desc}
           </div>
 
-          <div style="display: flex; flex-direction: column; gap: 0.35rem; background: rgba(0,0,0,0.3); padding: 0.65rem; border-radius: var(--radius-xs); margin-bottom: 0.75rem; border: 1px dashed var(--border-subtle);">
+          <div style="display: flex; flex-direction: column; gap: 0.35rem; background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: var(--radius-xs); margin-bottom: 0.85rem; border: 1px dashed var(--border-subtle);">
             ${gainsHtml}
             ${lossesHtml}
           </div>
 
-          <button class="btn btn-primary btn-block btn-sm btn-choice-standard">
+          <button class="btn btn-primary btn-block btn-sm btn-choice-standard" aria-label="Confirmar esta escolha">
             ✔️ Escolher Esta Opção
           </button>
         `;
