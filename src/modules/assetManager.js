@@ -95,29 +95,70 @@ export const ASSET_PATHS = {
 
   // Banners Ilustrados de Eventos Narrativos
   events: {
-    camarote_carnaval: 'assets/images/events/event_noitada_pagode.png',
-    noite_cassino: 'assets/images/events/event_noitada_pagode.png',
-    proposta_irrecusavel_arabia: 'assets/images/events/event_mundo_arabe.png',
-    patrocinio_apostas: 'assets/images/events/event_mundo_arabe.png',
-    infiltracao_na_final: 'assets/images/events/event_lesao_joelho.png',
-    moto_jetski_folga: 'assets/images/events/event_lesao_joelho.png',
-    podcast_polemico: 'assets/images/events/event_polemica_social.png',
-    fofoca_influencer: 'assets/images/events/event_polemica_social.png',
-    processar_jornalista: 'assets/images/events/event_polemica_social.png',
-    dancinha_tiktok: 'assets/images/events/event_polemica_social.png',
-    treta_capitao: 'assets/images/events/event_briga_tunel.png',
-    panela_do_vestiario: 'assets/images/events/event_briga_tunel.png',
-    briga_batedor_oficial: 'assets/images/events/event_briga_tunel.png',
-    carrinho_salvador: 'assets/images/events/event_briga_tunel.png',
-    penalti_aos_49: 'assets/images/events/event_briga_tunel.png',
-    mala_branca: 'assets/images/events/event_empresario_luxo.png',
-    comprar_carro_ostentacao: 'assets/images/events/event_empresario_luxo.png',
-    reclamar_salario_atrasado: 'assets/images/events/event_empresario_luxo.png',
-    tatuagem_proibida: 'assets/images/events/event_noitada_pagode.png',
+    camarote_carnaval: 'assets/images/events/event_noitada_pagode.webp',
+    noite_cassino: 'assets/images/events/event_noitada_pagode.webp',
+    proposta_irrecusavel_arabia: 'assets/images/events/event_mundo_arabe.webp',
+    patrocinio_apostas: 'assets/images/events/event_mundo_arabe.webp',
+    infiltracao_na_final: 'assets/images/events/event_lesao_joelho.webp',
+    moto_jetski_folga: 'assets/images/events/event_lesao_joelho.webp',
+    podcast_polemico: 'assets/images/events/event_polemica_social.webp',
+    fofoca_influencer: 'assets/images/events/event_polemica_social.webp',
+    processar_jornalista: 'assets/images/events/event_polemica_social.webp',
+    dancinha_tiktok: 'assets/images/events/event_polemica_social.webp',
+    treta_capitao: 'assets/images/events/event_briga_tunel.webp',
+    panela_do_vestiario: 'assets/images/events/event_briga_tunel.webp',
+    briga_batedor_oficial: 'assets/images/events/event_briga_tunel.webp',
+    carrinho_salvador: 'assets/images/events/event_briga_tunel.webp',
+    penalti_aos_49: 'assets/images/events/event_briga_tunel.webp',
+    mala_branca: 'assets/images/events/event_empresario_luxo.webp',
+    comprar_carro_ostentacao: 'assets/images/events/event_carro_ostentacao.webp',
+    reclamar_salario_atrasado: 'assets/images/events/event_empresario_luxo.webp',
+    tatuagem_proibida: 'assets/images/events/event_noitada_pagode.webp',
+  },
+
+  // Cutscenes de Momentos Críticos de Partida
+  moments: {
+    last_minute_goal: 'assets/images/moments/moment_last_minute_goal.webp',
+    penalty_kickoff: 'assets/images/moments/moment_penalty_kickoff.webp',
+    tackle_duel: 'assets/images/moments/moment_tackle_duel.webp',
+    freekick_topcorner: 'assets/images/moments/moment_freekick_topcorner.webp',
+    goalkeeper_save: 'assets/images/moments/moment_goalkeeper_save.webp',
+  },
+
+  // Telas e Pôsteres de Glória & Desfecho
+  glory: {
+    champion_trophy_lift: 'assets/images/glory/glory_champion_trophy_lift.webp',
+    ballon_dor_gala: 'assets/images/glory/glory_ballon_dor_gala.webp',
+    elimination_heartbreak: 'assets/images/glory/glory_elimination_heartbreak.webp',
+    retirement_locker: 'assets/images/glory/glory_retirement_locker.webp',
+  },
+
+  // Fundos de Imersão e Atmosfera
+  backgrounds: {
+    tunnel_stadium: 'assets/images/backgrounds/bg_tunnel_stadium_night.webp',
+    tactical_locker_room: 'assets/images/backgrounds/bg_tactical_locker_room.webp',
+    pitch_floodlights_rain: 'assets/images/backgrounds/bg_pitch_floodlights_rain.webp',
   }
 };
 
 export class AssetManager {
+  /**
+   * Retorna o caminho de imagem de momento crítico de partida
+   * @param {string} key 
+   * @returns {string}
+   */
+  static getMomentImage(key) {
+    return ASSET_PATHS.moments[key] || '';
+  }
+
+  /**
+   * Retorna o caminho de pôster de celebração ou glória
+   * @param {string} key 
+   * @returns {string}
+   */
+  static getGloryImage(key) {
+    return ASSET_PATHS.glory[key] || '';
+  }
   /**
    * Retorna o caminho do ícone de atributo ou UI
    * @param {string} key 'morale' | 'reputation' | 'physical' | 'money' | 'potential' | 'gamble' | 'guaranteed'
