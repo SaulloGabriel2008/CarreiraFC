@@ -234,6 +234,9 @@ export const NATIONAL_TEAMS = [
 export function getNationalTeamById(idOrCountry) {
   if (!idOrCountry) return NATIONAL_TEAMS[0];
   const query = idOrCountry.toLowerCase().trim();
+  if (query === 'eua' || query === 'usa') {
+    return NATIONAL_TEAMS.find(t => t.id === 'estados_unidos');
+  }
   return NATIONAL_TEAMS.find(t => 
     t.id.toLowerCase() === query || 
     t.country.toLowerCase() === query ||

@@ -96,6 +96,7 @@ export function handleStartCareer(creationParams) {
     name: creationParams.name,
     nickname: creationParams.nickname,
     position: creationParams.position,
+    nationality: creationParams.nationality || "Brasil",
     archetype: creationParams.archetype,
     currentClubId: creationParams.currentClubId,
     age: 17

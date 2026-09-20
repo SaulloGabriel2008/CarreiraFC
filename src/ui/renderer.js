@@ -7,6 +7,7 @@
 import { POSITIONS, getArchetypesByPosition, getArchetypeById } from '../data/archetypes.js';
 import { getRandomStartingClubs, getClubById } from '../data/clubs.js';
 import { LIFESTYLE_CATEGORIES, LIFESTYLE_ITEMS, getItemsByCategory, getLifestyleItemById } from '../data/lifestyle.js';
+import { getAllNationalities, getNationalTeamById } from '../data/nationalTeams.js';
 import { AssetManager } from '../modules/assetManager.js';
 
 /**
@@ -36,16 +37,36 @@ export function initCreationForm(onStartCareerCallback) {
   const archetypeDesc = document.getElementById('archetype-desc');
   const clubsGrid = document.getElementById('starting-clubs-grid');
   const clubHiddenInput = document.getElementById('player-club');
+  const nationalitySelect = document.getElementById('player-nationality');
   const btnRerollClubs = document.getElementById('btn-reroll-clubs');
 
   if (!form) return;
+
+  // 0. Inicializa Seletor de Nacionalidade com Bandeiras
+  if (nationalitySelect) {
+    nationalitySelect.innerHTML = '';
+    const nationalities = getAllNationalities();
+    nationalities.forEach(nat => {
+      const opt = document.createElement('option');
+      opt.value = nat.country;
+      opt.textContent = `${nat.flagEmoji} ${nat.country}`;
+      if (nat.country === 'Brasil') opt.selected = true;
+      nationalitySelect.appendChild(opt);
+    });
+
+    nationalitySelect.addEventListener('change', () => {
+      renderClubsSelection();
+    });
+  }
 
   // 1. Função para sortear e renderizar os 3 clubes formadores aleatórios
   const renderClubsSelection = () => {
     if (!clubsGrid || !clubHiddenInput) return;
     clubsGrid.innerHTML = '';
 
-    const randomClubs = getRandomStartingClubs(3);
+    const selectedCountry = nationalitySelect ? nationalitySelect.value : "Brasil";
+    const randomClubs = getRandomStartingClubs(3, selectedCountry);
+
     randomClubs.forEach((club, index) => {
       const card = document.createElement('div');
       card.className = `starting-club-card ${index === 0 ? 'selected' : ''}`;
@@ -56,7 +77,7 @@ export function initCreationForm(onStartCareerCallback) {
       card.innerHTML = `
         <div style="margin-bottom: 0.25rem;">${AssetManager.renderClubBadgeHtml(club, 42)}</div>
         <span class="starting-club-name">${club.shortName || club.name}</span>
-        <span class="starting-club-sub">Tier ${club.tier} &bull; Base 65 OVR</span>
+        <span class="starting-club-sub">${club.country} &bull; Tier ${club.tier}</span>
       `;
 
       const selectClub = () => {
@@ -153,6 +174,7 @@ export function initCreationForm(onStartCareerCallback) {
     }
 
     const nickname = nicknameInput ? nicknameInput.value.trim() : "";
+    const nationality = nationalitySelect ? nationalitySelect.value : "Brasil";
     const position = currentPosition || "CA";
     const archetype = archetypeSelect ? archetypeSelect.value : "matador_ca";
     const currentClubId = clubHiddenInput ? clubHiddenInput.value : "santos";
@@ -161,6 +183,7 @@ export function initCreationForm(onStartCareerCallback) {
       onStartCareerCallback({
         name,
         nickname,
+        nationality,
         position,
         archetype,
         currentClubId
@@ -205,6 +228,11 @@ export function renderDashboard(player, currentYear = 2026) {
   }
   if (posBadge) {
     posBadge.textContent = `${positionInfo.icon} ${player.position}`;
+  }
+  const nationalityBadge = document.getElementById('dash-nationality-badge');
+  if (nationalityBadge) {
+    const natTeam = getNationalTeamById(player.nationality);
+    nationalityBadge.innerHTML = `${natTeam.flagEmoji} ${natTeam.country}`;
   }
   if (clubBadgeSlot) {
     clubBadgeSlot.innerHTML = AssetManager.renderClubBadgeHtml(club, 24);
@@ -939,10 +967,16 @@ export function showTransferMarketModal(player, marketData, onDecisionCallback) 
 
   modalTitle.innerHTML = `💼 Janela de Transferências • Mercado da Bola`;
 
-  const offersHtml = marketData.offers.map((offer, idx) => `
+  const offersHtml = marketData.offers.map((offer, idx) => {
+    const offerClub = getClubById(offer.clubId) || offer;
+    const badgeHtml = AssetManager.renderClubBadgeHtml(offerClub, 28);
+    return `
     <div class="card-panel" style="background: var(--bg-card); border-color: var(--border-medium); margin-bottom: 0.75rem; padding: 0.85rem;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-        <span style="font-size: 1.05rem; font-weight: 800;">${offer.emoji} ${offer.clubName} <small style="color: var(--text-muted); font-size: 0.75rem;">(${offer.country})</small></span>
+        <span style="display: flex; align-items: center; gap: 0.5rem; font-size: 1.05rem; font-weight: 800;">
+          ${badgeHtml}
+          <span>${offer.clubName} <small style="color: var(--text-muted); font-size: 0.75rem;">(${offer.country})</small></span>
+        </span>
         <span class="badge badge-pos">${offer.squadRole}</span>
       </div>
       <div style="display: flex; gap: 1rem; font-size: 0.84rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
@@ -953,7 +987,8 @@ export function showTransferMarketModal(player, marketData, onDecisionCallback) 
         ✍️ Assinar com ${offer.clubName}
       </button>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   modalBody.innerHTML = `
     <div style="display: flex; flex-direction: column; gap: 0.75rem;">
