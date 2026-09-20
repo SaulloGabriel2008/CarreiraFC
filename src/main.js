@@ -228,8 +228,8 @@ export function handleSimulateSeason() {
     if (gameState.recentEventIds.length > 6) gameState.recentEventIds.shift();
 
     switchView('event');
-    renderEventView(event, (choiceId) => {
-      const outcome = EventEngine.processChoice(gameState.player, event, choiceId);
+    renderEventView(event, (choiceId, mode) => {
+      const outcome = EventEngine.processChoice(gameState.player, event, choiceId, mode);
       renderEventOutcome(outcome, () => {
         switchView('dashboard');
         renderDashboard(gameState.player, gameState.currentYear);

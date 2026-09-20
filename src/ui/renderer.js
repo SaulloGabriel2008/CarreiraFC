@@ -378,8 +378,9 @@ export function showSeasonModal(seasonReport, progression, onContinueCallback) {
 
 /**
  * Renderiza o Dilema Esportivo / Extracampo na tela #view-event
+ * com exibição explícita de ganhos e perdas e botões de 'Ir no Garantido' vs 'Arriscar no Sorteio'.
  * @param {object} event Objeto do evento
- * @param {Function} onChoiceCallback Callback chamado com o choiceId
+ * @param {Function} onChoiceCallback Callback chamado com (choiceId, mode) onde mode é 'guaranteed' ou 'gamble'
  */
 export function renderEventView(event, onChoiceCallback) {
   const catEl = document.getElementById('event-category');
@@ -394,16 +395,92 @@ export function renderEventView(event, onChoiceCallback) {
   if (choicesContainer) {
     choicesContainer.innerHTML = '';
     event.choices.forEach(choice => {
-      const btn = document.createElement('button');
-      btn.className = 'choice-btn';
-      btn.innerHTML = `
-        <span class="choice-label">${choice.text}</span>
-        <span class="choice-risk">⚡ ${choice.riskLabel || 'Impacto Imediato'}</span>
-      `;
-      btn.onclick = () => {
-        if (onChoiceCallback) onChoiceCallback(choice.id);
-      };
-      choicesContainer.appendChild(btn);
+      const choiceCard = document.createElement('div');
+      choiceCard.className = 'card-panel';
+      choiceCard.style.cssText = 'background: var(--bg-surface); border: 1px solid var(--border-medium); margin-bottom: 0.85rem; padding: 1rem; border-radius: var(--radius-sm);';
+
+      // Monta badges de Ganhos Base
+      const gainBadges = [];
+      const baseGain = choice.baseGain || {};
+      if (baseGain.morale) gainBadges.push(`<span class="badge badge-green">+${baseGain.morale} Moral</span>`);
+      if (baseGain.reputation) gainBadges.push(`<span class="badge badge-gold">+${baseGain.reputation} Reputação</span>`);
+      if (baseGain.physical) gainBadges.push(`<span class="badge badge-green">+${baseGain.physical} Físico</span>`);
+      if (baseGain.overall) gainBadges.push(`<span class="badge badge-gold">+${baseGain.overall} Overall</span>`);
+      if (baseGain.money) gainBadges.push(`<span class="badge badge-gold">+${formatMoney(baseGain.money)}</span>`);
+
+      // Monta badges de Perdas Base
+      const lossBadges = [];
+      const baseLoss = choice.baseLoss || {};
+      if (baseLoss.morale) lossBadges.push(`<span class="badge badge-red">${baseLoss.morale} Moral</span>`);
+      if (baseLoss.reputation) lossBadges.push(`<span class="badge badge-red">${baseLoss.reputation} Reputação</span>`);
+      if (baseLoss.physical) lossBadges.push(`<span class="badge badge-red">${baseLoss.physical} Físico</span>`);
+      if (baseLoss.overall) lossBadges.push(`<span class="badge badge-red">${baseLoss.overall} Overall</span>`);
+      if (baseLoss.money) lossBadges.push(`<span class="badge badge-red">-${formatMoney(Math.abs(baseLoss.money))}</span>`);
+
+      const gainsHtml = gainBadges.length > 0 ? `<div><small style="color: var(--accent-green); font-weight: 700;">Ganhos Base:</small> ${gainBadges.join(' ')}</div>` : '';
+      const lossesHtml = lossBadges.length > 0 ? `<div><small style="color: var(--accent-red); font-weight: 700;">Perdas Base:</small> ${lossBadges.join(' ')}</div>` : '';
+
+      // Se possui a mecânica de Sorteio (Gamble)
+      if (choice.hasGamble && choice.gamble) {
+        choiceCard.innerHTML = `
+          <div style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.3rem;">
+            ${choice.text}
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+            ${choice.desc}
+          </div>
+          
+          <div style="display: flex; flex-direction: column; gap: 0.35rem; background: rgba(0,0,0,0.3); padding: 0.65rem; border-radius: var(--radius-xs); margin-bottom: 0.75rem; border: 1px dashed var(--border-subtle);">
+            ${gainsHtml}
+            ${lossesHtml}
+            <div style="font-size: 0.78rem; color: var(--accent-gold); margin-top: 0.2rem;">
+              🎲 <b>Sorteio Opcional:</b> ${choice.gamble.gambleLabel}
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
+            <button class="btn btn-secondary btn-sm btn-choice-guaranteed" style="border-color: var(--accent-green);">
+              🛡️ Ir no Garantido (100% Certo)
+            </button>
+            <button class="btn btn-gold btn-sm btn-choice-gamble">
+              🎲 Arriscar no Sorteio!
+            </button>
+          </div>
+        `;
+
+        choiceCard.querySelector('.btn-choice-guaranteed').onclick = () => {
+          if (onChoiceCallback) onChoiceCallback(choice.id, 'guaranteed');
+        };
+        choiceCard.querySelector('.btn-choice-gamble').onclick = () => {
+          if (onChoiceCallback) onChoiceCallback(choice.id, 'gamble');
+        };
+      } 
+      // Escolha Padrão (Sem Sorteio)
+      else {
+        choiceCard.innerHTML = `
+          <div style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.3rem;">
+            ${choice.text}
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+            ${choice.desc}
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.35rem; background: rgba(0,0,0,0.3); padding: 0.65rem; border-radius: var(--radius-xs); margin-bottom: 0.75rem; border: 1px dashed var(--border-subtle);">
+            ${gainsHtml}
+            ${lossesHtml}
+          </div>
+
+          <button class="btn btn-primary btn-block btn-sm btn-choice-standard">
+            ✔️ Escolher Esta Opção
+          </button>
+        `;
+
+        choiceCard.querySelector('.btn-choice-standard').onclick = () => {
+          if (onChoiceCallback) onChoiceCallback(choice.id, 'guaranteed');
+        };
+      }
+
+      choicesContainer.appendChild(choiceCard);
     });
   }
 }
@@ -420,23 +497,29 @@ export function renderEventOutcome(outcomeResult, onContinueCallback) {
   if (!choicesContainer || !descEl) return;
 
   const isSuccess = outcomeResult.isSuccess;
+  const isGamble = outcomeResult.isGamble;
   const changes = outcomeResult.changes;
 
   // Monta badges de deltas de atributos
   const badges = [];
-  if (changes.morale !== 0) badges.push(`<span class="badge ${changes.morale > 0 ? 'badge-green' : 'badge-red'}">Moral ${changes.morale > 0 ? '+' : ''}${changes.morale}</span>`);
-  if (changes.reputation !== 0) badges.push(`<span class="badge ${changes.reputation > 0 ? 'badge-gold' : 'badge-red'}">Reputação ${changes.reputation > 0 ? '+' : ''}${changes.reputation}</span>`);
-  if (changes.physical !== 0) badges.push(`<span class="badge ${changes.physical > 0 ? 'badge-green' : 'badge-red'}">Físico ${changes.physical > 0 ? '+' : ''}${changes.physical}</span>`);
-  if (changes.overall !== 0) badges.push(`<span class="badge ${changes.overall > 0 ? 'badge-gold' : 'badge-red'}">Overall ${changes.overall > 0 ? '+' : ''}${changes.overall}</span>`);
-  if (changes.money !== 0) badges.push(`<span class="badge badge-gold">Finanças ${changes.money > 0 ? '+' : ''}R$ ${Math.abs(changes.money)}</span>`);
+  if (changes.morale) badges.push(`<span class="badge ${changes.morale > 0 ? 'badge-green' : 'badge-red'}">Moral ${changes.morale > 0 ? '+' : ''}${changes.morale}</span>`);
+  if (changes.reputation) badges.push(`<span class="badge ${changes.reputation > 0 ? 'badge-gold' : 'badge-red'}">Reputação ${changes.reputation > 0 ? '+' : ''}${changes.reputation}</span>`);
+  if (changes.physical) badges.push(`<span class="badge ${changes.physical > 0 ? 'badge-green' : 'badge-red'}">Físico ${changes.physical > 0 ? '+' : ''}${changes.physical}</span>`);
+  if (changes.overall) badges.push(`<span class="badge ${changes.overall > 0 ? 'badge-gold' : 'badge-red'}">Overall ${changes.overall > 0 ? '+' : ''}${changes.overall}</span>`);
+  if (changes.money) badges.push(`<span class="badge badge-gold">Finanças ${changes.money > 0 ? '+' : ''}R$ ${Math.abs(changes.money)}</span>`);
+
+  const modeBadge = isGamble 
+    ? `<span class="badge badge-gold" style="margin-bottom: 0.5rem;">🎲 Resolução por Sorteio</span>`
+    : `<span class="badge badge-green" style="margin-bottom: 0.5rem;">🛡️ Resolução Garantida</span>`;
 
   descEl.innerHTML = `
-    <div style="font-size: 1.15rem; font-weight: 800; color: ${isSuccess ? 'var(--accent-green)' : 'var(--accent-red)'}; margin-bottom: 0.65rem;">
-      ${isSuccess ? '✅ SUCESSO ESPORTIVO!' : '⚠️ COMPLICAÇÕES GRAVES!'}
+    ${modeBadge}
+    <div style="font-size: 1.25rem; font-weight: 900; color: ${isSuccess ? 'var(--accent-green)' : 'var(--accent-red)'}; margin-bottom: 0.65rem;">
+      ${outcomeResult.title || (isSuccess ? '✅ SUCESSO ESPORTIVO!' : '⚠️ COMPLICAÇÕES GRAVES!')}
     </div>
-    <p style="margin-bottom: 1rem; color: var(--text-main);">${outcomeResult.text}</p>
+    <p style="margin-bottom: 1rem; color: var(--text-main); font-size: 0.95rem; line-height: 1.6;">${outcomeResult.text}</p>
     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-      ${badges.join(' ')}
+      ${badges.length > 0 ? badges.join(' ') : '<span class="badge">Nenhuma alteração nos atributos</span>'}
     </div>
   `;
 
@@ -453,6 +536,7 @@ export function renderEventOutcome(outcomeResult, onContinueCallback) {
     };
   }
 }
+
 
 /**
  * Exibe a Janela de Transferências com propostas na mesa
