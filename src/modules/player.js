@@ -1,7 +1,7 @@
 /**
  * CARREIRA FC - MÓDULO: JOGADOR (PLAYER)
- * Entidade central orientada a objetos que gerencia os atributos, evolução etária,
- * estatísticas acumuladas, finanças e legado de carreira.
+ * Entidade central com suporte a 10 posições táticas, Overall inicial uniforme,
+ * Potencial Dinâmico Oculto (Fog of War) e Perfis Etários Não-Lineares (Late Bloomers, Prodígios e Flops).
  */
 
 import { ARCHETYPES, getArchetypeById } from '../data/archetypes.js';
@@ -16,8 +16,8 @@ export class Player {
     this.id = params.id || `player_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
     this.name = params.name || "Jogador Promissor";
     this.nickname = params.nickname || "";
-    this.position = params.position || "ATA"; // 'GOL' | 'ZAG' | 'MEI' | 'ATA'
-    this.archetype = params.archetype || "matador";
+    this.position = params.position || "CA"; // GOL, ZAG, LD, LE, VOL, MC, MEI, PE, PD, CA
+    this.archetype = params.archetype || "matador_ca";
     this.nationality = params.nationality || "Brasil";
     
     // Idade e Biometria
@@ -25,13 +25,19 @@ export class Player {
     this.isRetired = params.isRetired || false;
     this.retirementReason = params.retirementReason || null;
 
-    // Atributos Nucleares
+    // Perfil Oculto de Desenvolvimento Etário
+    // 'early_bloomer' (18-21) | 'late_bloomer' (25-28) | 'steady' (regular) | 'underachiever' (flop)
+    this.growthProfile = params.growthProfile || this._generateGrowthProfile();
+
+    // Potencial Dinâmico Oculto (o jogador NÃO vê este número)
     this.potential = params.potential || this._generateInitialPotential();
+
+    // Físico, Reputação e Moral
     this.physical = params.physical || 85;
     this.reputation = params.reputation || 15; // 1 a 100
     this.morale = params.morale || 80; // 0 a 100
     
-    // Atributos Específicos por Posição (0 a 99)
+    // Atributos Específicos por Posição (Nivelados para manter Overall base 64-66 uniforme)
     this.attributes = params.attributes || this._generateInitialAttributes();
 
     // Overall calculado
@@ -40,9 +46,9 @@ export class Player {
 
     // Contrato e Clube
     this.currentClubId = params.currentClubId || "santos";
-    this.wage = params.wage || 12000; // Salário mensal em R$
+    this.wage = params.wage || 12000;
     this.marketValue = params.marketValue || this.calculateMarketValue();
-    this.finances = params.finances || 35000; // Saldo bancário acumulado
+    this.finances = params.finances || 35000;
 
     // Carreira e Estatísticas Acumuladas
     this.careerStats = params.careerStats || {
@@ -60,63 +66,70 @@ export class Player {
   }
 
   /**
-   * Gera o potencial oculto inicial do atleta (entre 72 e 96)
+   * Sorteia o perfil oculto de trajetória da carreira
+   * @private
+   */
+  _generateGrowthProfile() {
+    const r = Math.random();
+    if (r < 0.25) return 'early_bloomer'; // 25% Prodígio (Neymar, Mbappé)
+    if (r < 0.55) return 'late_bloomer';  // 30% Maturação Tardia (Vardy, Hulk, Cano, Grafite)
+    if (r < 0.85) return 'steady';        // 30% Constante e regular
+    return 'underachiever';               // 15% Eterna Promessa que não vinga
+  }
+
+  /**
+   * Gera o teto de potencial inicial oculto
    * @private
    */
   _generateInitialPotential() {
-    // Curva ponderada para dar boas promessas com chance de supercraques
-    const rand = Math.random();
-    if (rand < 0.10) return 90 + Math.floor(Math.random() * 7); // 10% de ser um fenômeno (90-96)
-    if (rand < 0.40) return 84 + Math.floor(Math.random() * 6); // 30% de craque de elite (84-89)
-    if (rand < 0.80) return 78 + Math.floor(Math.random() * 6); // 40% de jogador titular sólido (78-83)
-    return 72 + Math.floor(Math.random() * 6); // 20% de jogador regular (72-77)
+    if (this.growthProfile === 'underachiever') {
+      return 68 + Math.floor(Math.random() * 7); // 68 a 74
+    }
+    if (this.growthProfile === 'late_bloomer') {
+      return 82 + Math.floor(Math.random() * 12); // 82 a 93 (pode virar monstro mais velho)
+    }
+    if (this.growthProfile === 'early_bloomer') {
+      return 84 + Math.floor(Math.random() * 11); // 84 a 94
+    }
+    return 77 + Math.floor(Math.random() * 11); // 77 a 87
   }
 
   /**
-   * Gera os atributos iniciais compatíveis com a posição e arquétipo para 17 anos
+   * Gera os atributos iniciais rigorosamente nivelados para base uniforme (64-66)
    * @private
    */
   _generateInitialAttributes() {
-    const baseVal = 62 + Math.floor(Math.random() * 6); // Base inicial de 62 a 67
-    const arch = getArchetypeById(this.archetype);
+    // Base uniforme aos 17 anos para qualquer clube formador
+    const base = 65;
+    const pos = this.position;
 
-    if (this.position === "ATA") {
-      return {
-        finishing: baseVal + (this.archetype === "matador" ? 7 : 2),
-        pace: baseVal + (this.archetype === "ponta_veloz" ? 8 : 1),
-        dribbling: baseVal + (this.archetype === "ponta_veloz" ? 6 : 0),
-        passing: baseVal - 3,
-        heading: baseVal + (this.archetype === "matador" ? 4 : -2)
-      };
-    } else if (this.position === "MEI") {
-      return {
-        passing: baseVal + (this.archetype === "camisa_10" ? 8 : 3),
-        vision: baseVal + (this.archetype === "camisa_10" ? 7 : 2),
-        dribbling: baseVal + 3,
-        shooting: baseVal + (this.archetype === "box_to_box" ? 5 : 0),
-        defense: baseVal + (this.archetype === "volante_racudo" ? 9 : -4)
-      };
-    } else if (this.position === "ZAG") {
-      return {
-        tackling: baseVal + (this.archetype === "xerife" ? 8 : 4),
-        strength: baseVal + (this.archetype === "xerife" ? 7 : 2),
-        positioning: baseVal + 4,
-        heading: baseVal + (this.archetype === "zag_artilheiro" ? 8 : 3),
-        pace: baseVal + (this.archetype === "libero_tecnico" ? 4 : -2)
-      };
-    } else { // GOL
-      return {
-        reflexes: baseVal + (this.archetype === "paredao" ? 9 : 4),
-        diving: baseVal + 5,
-        handling: baseVal + 3,
-        positioning: baseVal + 4,
-        kicking: baseVal + (this.archetype === "goleiro_artilheiro" ? 9 : -2)
-      };
+    if (pos === "GOL") {
+      return { reflexes: base + 2, diving: base + 1, handling: base - 1, positioning: base, kicking: base - 2 };
     }
+    if (pos === "ZAG") {
+      return { tackling: base + 2, strength: base + 2, positioning: base, heading: base + 1, pace: base - 3 };
+    }
+    if (pos === "LD" || pos === "LE") {
+      return { pace: base + 3, crossing: base + 1, tackling: base, passing: base, stamina: base + 2 };
+    }
+    if (pos === "VOL") {
+      return { tackling: base + 3, passing: base, strength: base + 2, vision: base - 1, stamina: base + 2 };
+    }
+    if (pos === "MC") {
+      return { passing: base + 2, vision: base + 1, dribbling: base, tackling: base - 1, stamina: base + 1 };
+    }
+    if (pos === "MEI") {
+      return { vision: base + 3, passing: base + 2, dribbling: base + 1, shooting: base, pace: base - 1 };
+    }
+    if (pos === "PE" || pos === "PD") {
+      return { pace: base + 3, dribbling: base + 2, crossing: base, finishing: base - 1, passing: base - 1 };
+    }
+    // CA
+    return { finishing: base + 3, positioning: base + 2, heading: base + 1, shooting: base + 1, pace: base - 1 };
   }
 
   /**
-   * Calcula a média ponderada dos atributos da posição para definir o Overall (35 a 99)
+   * Calcula a média dos atributos para definir o Overall (35 a 99)
    * @returns {number}
    */
   calculateOverall() {
@@ -129,15 +142,17 @@ export class Player {
       count++;
     }
 
-    let ovr = count > 0 ? Math.round(sum / count) : 65;
-    
-    // Bônus leve do arquétipo
-    const arch = getArchetypeById(this.archetype);
-    if (arch && arch.modifiers && arch.modifiers.ratingBaseBonus) {
-      ovr += Math.round(arch.modifiers.ratingBaseBonus * 2);
-    }
+    const baseOvr = count > 0 ? Math.round(sum / count) : 65;
+    return Math.min(99, Math.max(35, baseOvr));
+  }
 
-    return Math.min(99, Math.max(40, ovr));
+  /**
+   * Atualiza o Potencial Dinâmico Oculto com base no desempenho e escolhas
+   * (O jogador não vê o número, mas sente os efeitos no longo prazo)
+   * @param {number} delta Variação (+ ou -)
+   */
+  updateDynamicPotential(delta) {
+    this.potential = Math.min(96, Math.max(62, this.potential + delta));
   }
 
   /**
@@ -145,58 +160,118 @@ export class Player {
    * @returns {number} Em Reais
    */
   calculateMarketValue() {
-    // Fatores: Overall, Idade e Potencial
     const ovrFactor = Math.pow(Math.max(50, this.overall) / 50, 4.2);
     let ageMultiplier = 1.0;
 
-    if (this.age <= 21) ageMultiplier = 1.6; // Valor inflacionado por juventude/promessa
+    if (this.age <= 21) ageMultiplier = 1.6;
     else if (this.age <= 25) ageMultiplier = 1.4;
     else if (this.age <= 29) ageMultiplier = 1.1;
     else if (this.age <= 32) ageMultiplier = 0.7;
-    else ageMultiplier = 0.35; // Veterano
+    else ageMultiplier = 0.35;
 
-    const baseVal = 500000; // 500 mil R$
+    const baseVal = 500000;
     return Math.round((baseVal * ovrFactor * ageMultiplier) / 10000) * 10000;
   }
 
   /**
-   * Aplica a evolução ou declínio anual com base na curva etária
+   * Aplica a evolução ou declínio anual respeitando as Curvas Não-Lineares (Late Bloomers / Prodígios / Flops)
    * @param {'balanced' | 'physical' | 'technical' | 'marketing'} trainingFocus 
-   * @returns {object} Resumo das mudanças ({ overallDelta, physicalDelta, text })
+   * @returns {object} Resumo das mudanças ({ overallDelta, physicalDelta, newOverall, newPhysical })
    */
   applyAgeProgression(trainingFocus = 'balanced') {
     this.age += 1;
     let overallDelta = 0;
     let physicalDelta = 0;
+    const profile = this.growthProfile;
 
-    // 17 a 21 anos: Explosão de juventude
+    // =========================================================================
+    // FASE 1: 18 A 21 ANOS (Juventude)
+    // =========================================================================
     if (this.age <= 21) {
-      const gapToPotential = Math.max(0, this.potential - this.overall);
-      const growthRate = Math.max(2, Math.min(6, Math.floor(gapToPotential / 3) + Math.floor(Math.random() * 3)));
-      overallDelta = growthRate;
-      physicalDelta = Math.floor(Math.random() * 3); // +0 a +2
-    }
-    // 22 a 27 anos: Auge e consolidação
-    else if (this.age <= 27) {
-      if (this.overall < this.potential) {
-        overallDelta = Math.floor(Math.random() * 3) + 1; // +1 a +3
+      if (profile === 'early_bloomer') {
+        // Prodígio: explosão juvenil agressiva
+        overallDelta = Math.floor(Math.random() * 3) + 3; // +3 a +5
+        physicalDelta = Math.floor(Math.random() * 2) + 1;
+      } else if (profile === 'late_bloomer') {
+        // Late Bloomer: crescimento bem tímido aos 18-21, parece um jogador comum
+        overallDelta = Math.random() < 0.6 ? 1 : 0; // +0 a +1
+        physicalDelta = Math.random() < 0.5 ? 1 : 0;
+      } else if (profile === 'steady') {
+        // Constante: crescimento regular
+        overallDelta = Math.floor(Math.random() * 2) + 2; // +2 a +3
+        physicalDelta = 1;
       } else {
-        overallDelta = Math.random() < 0.5 ? 1 : 0; // Pequeno pico ou estabilidade
+        // Underachiever (Flop): começa devagar e perde fôlego
+        overallDelta = Math.random() < 0.5 ? 1 : 0;
+        physicalDelta = 0;
+        this.updateDynamicPotential(-1);
       }
-      physicalDelta = Math.random() < 0.3 ? 1 : 0;
-    }
-    // 28 a 31 anos: Maturidade e início sutil de perda física
-    else if (this.age <= 31) {
-      overallDelta = Math.random() < 0.4 ? 0 : -1;
-      physicalDelta = -(Math.floor(Math.random() * 2) + 1); // -1 a -2
-    }
-    // 32 anos em diante: Declínio físico acentuado
-    else {
-      physicalDelta = -(Math.floor(Math.random() * 4) + 2); // -2 a -5
-      overallDelta = -(Math.floor(Math.random() * 3) + 1); // -1 a -3
     }
 
-    // Modificadores de Foco de Treino da Pré-Temporada
+    // =========================================================================
+    // FASE 2: 22 A 24 ANOS (Transição)
+    // =========================================================================
+    else if (this.age <= 24) {
+      if (profile === 'early_bloomer') {
+        overallDelta = Math.min(this.potential - this.overall, Math.floor(Math.random() * 2) + 1); // +1 a +2
+        physicalDelta = 0;
+      } else if (profile === 'late_bloomer') {
+        // Ainda sem estourar, maturação lenta
+        overallDelta = Math.floor(Math.random() * 2) + 1; // +1 a +2
+        physicalDelta = 1;
+      } else if (profile === 'steady') {
+        overallDelta = Math.floor(Math.random() * 2) + 1; // +1 a +2
+        physicalDelta = 0;
+      } else {
+        // Underachiever estagna completamente
+        overallDelta = Math.random() < 0.3 ? 1 : 0;
+        this.updateDynamicPotential(-2);
+      }
+    }
+
+    // =========================================================================
+    // FASE 3: 25 A 28 ANOS (O Momento da Explosão do LATE BLOOMER!)
+    // =========================================================================
+    else if (this.age <= 28) {
+      if (profile === 'late_bloomer') {
+        // AQUI O LATE BLOOMER EXPLODE! (Estilo Vardy, Hulk, Cano, Grafite)
+        const gap = Math.max(2, this.potential - this.overall);
+        overallDelta = Math.max(2, Math.min(5, Math.floor(gap / 2) + Math.floor(Math.random() * 2))); // +3 a +5 ao ano!
+        physicalDelta = Math.random() < 0.5 ? 1 : 0;
+      } else if (profile === 'early_bloomer' || profile === 'steady') {
+        // Auge / Manutenção de alto nível
+        overallDelta = (this.overall < this.potential && Math.random() < 0.4) ? 1 : 0;
+        physicalDelta = Math.random() < 0.3 ? 0 : -1;
+      } else {
+        // Underachiever começa a declinar precocemente
+        overallDelta = Math.random() < 0.4 ? 0 : -1;
+        physicalDelta = -1;
+      }
+    }
+
+    // =========================================================================
+    // FASE 4: 29 A 32 ANOS (Maturidade e Início de Queda Física)
+    // =========================================================================
+    else if (this.age <= 32) {
+      if (profile === 'late_bloomer') {
+        // Late bloomer dura bem no auge
+        overallDelta = Math.random() < 0.5 ? 0 : -1;
+        physicalDelta = -(Math.floor(Math.random() * 2) + 1);
+      } else {
+        overallDelta = Math.random() < 0.4 ? 0 : -1;
+        physicalDelta = -(Math.floor(Math.random() * 3) + 1);
+      }
+    }
+
+    // =========================================================================
+    // FASE 5: 33 ANOS EM DIANTE (Declínio Acentuado)
+    // =========================================================================
+    else {
+      overallDelta = -(Math.floor(Math.random() * 3) + 1); // -1 a -3
+      physicalDelta = -(Math.floor(Math.random() * 4) + 2); // -2 a -5
+    }
+
+    // Bônus de Treino
     if (trainingFocus === 'physical') {
       physicalDelta += 2;
     } else if (trainingFocus === 'technical') {
@@ -207,7 +282,7 @@ export class Player {
 
     // Aplicação aos atributos específicos
     for (const key in this.attributes) {
-      this.attributes[key] = Math.max(35, Math.min(99, this.attributes[key] + overallDelta));
+      this.attributes[key] = Math.max(30, Math.min(99, this.attributes[key] + overallDelta));
     }
 
     this.physical = Math.max(20, Math.min(99, this.physical + physicalDelta));
@@ -219,8 +294,8 @@ export class Player {
     }
 
     // Checagem de aposentadoria forçada
-    if (this.age >= 38 || this.physical <= 28 || this.overall <= 52) {
-      this.retire("Fim de ciclo natural por idade e desgaste físico.");
+    if (this.age >= 39 || this.physical <= 25 || this.overall <= 48) {
+      this.retire("Fim de carreira natural por desgaste físico e idade avançada.");
     }
 
     return {
@@ -233,7 +308,7 @@ export class Player {
   }
 
   /**
-   * Registra o resultado consolidado de uma temporada disputada
+   * Registra a temporada disputada e ajusta o potencial dinâmico oculto
    * @param {object} seasonData 
    */
   addSeasonRecord(seasonData) {
@@ -250,7 +325,6 @@ export class Player {
       awardsWon: seasonData.awardsWon || []
     });
 
-    // Atualiza acumuladores de carreira
     this.careerStats.totalGames += seasonData.games;
     this.careerStats.totalGoals += seasonData.goals;
     this.careerStats.totalAssists += seasonData.assists;
@@ -263,19 +337,24 @@ export class Player {
       seasonData.awardsWon.forEach(a => this.addAward(a));
     }
 
-    // Recalcula a nota média global da carreira
     const totalRatedGames = this.history.reduce((acc, h) => acc + h.games, 0);
     const weightedRatingSum = this.history.reduce((acc, h) => acc + (h.rating * h.games), 0);
     this.careerStats.averageRating = totalRatedGames > 0 ? +(weightedRatingSum / totalRatedGames).toFixed(2) : 0;
 
-    // Salário anual adicionado às finanças
-    this.finances += Math.round(this.wage * 13); // 13 salários
+    this.finances += Math.round(this.wage * 13);
+
+    // =========================================================================
+    // AJUSTE DO POTENCIAL DINÂMICO OCULTO POR DESEMPENHO (Fog of War)
+    // =========================================================================
+    if (seasonData.avgRating >= 7.60 && seasonData.games >= 25) {
+      // Temporada excelente aumenta o teto de crescimento futuro
+      this.updateDynamicPotential(+2);
+    } else if (seasonData.avgRating <= 6.50 || seasonData.games <= 10) {
+      // Pouco tempo de jogo ou notas ruins deterioram o teto do jogador
+      this.updateDynamicPotential(-2);
+    }
   }
 
-  /**
-   * Adiciona um troféu à sala de taças
-   * @param {object} trophy 
-   */
   addTrophy(trophy) {
     this.careerStats.trophies.push({
       id: trophy.id,
@@ -284,37 +363,28 @@ export class Player {
       clubId: this.currentClubId
     });
     this.reputation = Math.min(100, this.reputation + (trophy.reputationBonus || 5));
+    // Títulos conquistados aumentam a ambição e o potencial dinâmico
+    this.updateDynamicPotential(+1);
   }
 
-  /**
-   * Adiciona um prêmio individual conquistado
-   * @param {object} award 
-   */
   addAward(award) {
     this.careerStats.individualAwards.push(award);
     this.reputation = Math.min(100, this.reputation + 10);
+    this.updateDynamicPotential(+2);
   }
 
-  /**
-   * Declara a aposentadoria do jogador
-   * @param {string} reason 
-   */
   retire(reason = "Decisão voluntária de pendurar as chuteiras.") {
     this.isRetired = true;
     this.retirementReason = reason;
   }
 
-  /**
-   * Calcula a pontuação de legado e o título de lenda para o pôster final
-   * @returns {object} { score, tier, legacyTitle, summary }
-   */
   calculateLegacy() {
     const goalsScore = this.careerStats.totalGoals * 2.5;
-    const assistsScore = this.careerStats.totalAssists * 1.5;
+    const assistsScore = this.careerStats.totalAssists * 1.8;
     const gamesScore = this.careerStats.totalGames * 0.8;
     const trophiesScore = this.careerStats.trophies.length * 45;
     const awardsScore = this.careerStats.individualAwards.length * 60;
-    const peakBonus = Math.max(0, this.peakOverall - 70) * 20;
+    const peakBonus = Math.max(0, this.peakOverall - 70) * 22;
 
     const totalScore = Math.round(goalsScore + assistsScore + gamesScore + trophiesScore + awardsScore + peakBonus);
 
@@ -348,18 +418,10 @@ export class Player {
     };
   }
 
-  /**
-   * Serialização para JSON
-   */
   toJSON() {
     return { ...this };
   }
 
-  /**
-   * Desserialização a partir de objeto JSON
-   * @param {object} json 
-   * @returns {Player}
-   */
   static fromJSON(json) {
     return new Player(json);
   }

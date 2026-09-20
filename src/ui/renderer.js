@@ -5,7 +5,7 @@
  */
 
 import { POSITIONS, getArchetypesByPosition, getArchetypeById } from '../data/archetypes.js';
-import { getStartingClubs, getClubById } from '../data/clubs.js';
+import { getRandomStartingClubs, getClubById } from '../data/clubs.js';
 
 /**
  * Formata valores monetários no padrão brasileiro amigável (R$ mil / R$ mi)
@@ -28,26 +28,58 @@ export function formatMoney(value) {
  */
 export function initCreationForm(onStartCareerCallback) {
   const form = document.getElementById('form-create-player');
-  const posButtons = document.querySelectorAll('.pos-btn');
+  const pitchPins = document.querySelectorAll('.pitch-pin');
+  const selectedPosDisplay = document.getElementById('selected-pos-display');
   const archetypeSelect = document.getElementById('player-archetype');
   const archetypeDesc = document.getElementById('archetype-desc');
-  const clubSelect = document.getElementById('player-club');
+  const clubsGrid = document.getElementById('starting-clubs-grid');
+  const clubHiddenInput = document.getElementById('player-club');
+  const btnRerollClubs = document.getElementById('btn-reroll-clubs');
 
   if (!form) return;
 
-  // 1. Preenche os clubes de base / formação disponíveis
-  if (clubSelect) {
-    clubSelect.innerHTML = '';
-    const startingClubs = getStartingClubs();
-    startingClubs.forEach(club => {
-      const option = document.createElement('option');
-      option.value = club.id;
-      option.textContent = `${club.emoji} ${club.name} (Tier ${club.tier} - OVR ${club.overall})`;
-      clubSelect.appendChild(option);
+  // 1. Função para sortear e renderizar os 3 clubes formadores aleatórios
+  const renderClubsSelection = () => {
+    if (!clubsGrid || !clubHiddenInput) return;
+    clubsGrid.innerHTML = '';
+
+    const randomClubs = getRandomStartingClubs(3);
+    randomClubs.forEach((club, index) => {
+      const card = document.createElement('div');
+      card.className = `starting-club-card ${index === 0 ? 'selected' : ''}`;
+      card.setAttribute('data-club-id', club.id);
+      card.innerHTML = `
+        <span class="starting-club-emoji">${club.emoji}</span>
+        <span class="starting-club-name">${club.shortName || club.name}</span>
+        <span class="starting-club-sub">Tier ${club.tier} &bull; Base 65 OVR</span>
+      `;
+
+      card.onclick = () => {
+        document.querySelectorAll('.starting-club-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        clubHiddenInput.value = club.id;
+      };
+
+      clubsGrid.appendChild(card);
     });
+
+    // Define o primeiro como selecionado por padrão
+    if (randomClubs.length > 0) {
+      clubHiddenInput.value = randomClubs[0].id;
+    }
+  };
+
+  // Inicializa os 3 clubes sorteados
+  renderClubsSelection();
+
+  // Botão de re-sorteio de clubes
+  if (btnRerollClubs) {
+    btnRerollClubs.onclick = () => {
+      renderClubsSelection();
+    };
   }
 
-  // Função interna para atualizar a lista de arquétipos conforme a posição selecionada
+  // 2. Atualização dinâmica dos arquétipos conforme a posição no campinho
   const updateArchetypesForPos = (posCode) => {
     if (!archetypeSelect) return;
     archetypeSelect.innerHTML = '';
@@ -60,19 +92,24 @@ export function initCreationForm(onStartCareerCallback) {
       archetypeSelect.appendChild(opt);
     });
 
-    // Atualiza a descrição com o primeiro arquétipo da lista
     if (list.length > 0 && archetypeDesc) {
       archetypeDesc.textContent = list[0].shortDesc;
     }
+
+    if (selectedPosDisplay) {
+      const posInfo = POSITIONS[posCode] || { name: posCode, icon: "⚽" };
+      selectedPosDisplay.innerHTML = `${posInfo.icon} ${posCode} - ${posInfo.name}`;
+    }
   };
 
-  // 2. Listeners para os botões de posição (GOL, ZAG, MEI, ATA)
-  posButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      posButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const posCode = btn.getAttribute('data-pos');
-      updateArchetypesForPos(posCode);
+  // 3. Listeners nos Pins do Campinho Tático Interativo
+  let currentPosition = "CA";
+  pitchPins.forEach(pin => {
+    pin.addEventListener('click', () => {
+      pitchPins.forEach(p => p.classList.remove('active'));
+      pin.classList.add('active');
+      currentPosition = pin.getAttribute('data-pos');
+      updateArchetypesForPos(currentPosition);
     });
   });
 
@@ -86,16 +123,15 @@ export function initCreationForm(onStartCareerCallback) {
     });
   }
 
-  // Inicializa com Atacante selecionado por padrão
-  updateArchetypesForPos('ATA');
+  // Inicializa com Centroavante (CA) ativo por padrão
+  updateArchetypesForPos('CA');
 
-  // 3. Submissão do formulário de criação
+  // 4. Submissão do formulário de criação
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
     const nameInput = document.getElementById('player-name');
     const nicknameInput = document.getElementById('player-nickname');
-    const activePosBtn = document.querySelector('.pos-btn.active');
 
     const name = nameInput ? nameInput.value.trim() : "";
     if (!name) {
@@ -104,9 +140,9 @@ export function initCreationForm(onStartCareerCallback) {
     }
 
     const nickname = nicknameInput ? nicknameInput.value.trim() : "";
-    const position = activePosBtn ? activePosBtn.getAttribute('data-pos') : "ATA";
-    const archetype = archetypeSelect ? archetypeSelect.value : "matador";
-    const currentClubId = clubSelect ? clubSelect.value : "santos";
+    const position = currentPosition || "CA";
+    const archetype = archetypeSelect ? archetypeSelect.value : "matador_ca";
+    const currentClubId = clubHiddenInput ? clubHiddenInput.value : "santos";
 
     if (onStartCareerCallback) {
       onStartCareerCallback({
@@ -119,6 +155,7 @@ export function initCreationForm(onStartCareerCallback) {
     }
   });
 }
+
 
 /**
  * Renderiza todos os dados do atleta no Dashboard de Carreira

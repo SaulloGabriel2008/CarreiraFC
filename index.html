@@ -55,52 +55,100 @@
               </div>
             </div>
 
-            <!-- Seleção de Posição -->
+            <!-- Seleção de Posição: Campinho Tático Interativo (10 Posições) -->
             <div class="form-group">
-              <label class="form-label">Posição Principal</label>
-              <div class="position-selector-grid">
-                <button type="button" class="pos-btn" data-pos="GOL">
-                  <span>🧤 GOL</span>
-                  <span class="pos-sub">Goleiro</span>
-                </button>
-                <button type="button" class="pos-btn" data-pos="ZAG">
-                  <span>🛡️ ZAG</span>
-                  <span class="pos-sub">Zagueiro</span>
-                </button>
-                <button type="button" class="pos-btn" data-pos="MEI">
-                  <span>🎯 MEI</span>
-                  <span class="pos-sub">Meio-Campo</span>
-                </button>
-                <button type="button" class="pos-btn active" data-pos="ATA">
-                  <span>⚡ ATA</span>
-                  <span class="pos-sub">Atacante</span>
-                </button>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                <label class="form-label" style="margin-bottom: 0;">Posição no Campo (Clique no Gramado)</label>
+                <span id="selected-pos-display" class="badge badge-pos">⚽ CA - Centroavante</span>
+              </div>
+              
+              <div class="tactical-pitch-container">
+                <div class="tactical-pitch" id="tactical-pitch">
+                  <!-- Marcações do Gramado -->
+                  <div class="pitch-line pitch-center-circle"></div>
+                  <div class="pitch-line pitch-half-line"></div>
+                  <div class="pitch-line pitch-penalty-box-top"></div>
+                  <div class="pitch-line pitch-penalty-box-bottom"></div>
+                  <div class="pitch-line pitch-goal-box-top"></div>
+                  <div class="pitch-line pitch-goal-box-bottom"></div>
+                  
+                  <!-- Pins Interativos das 10 Posições -->
+                  <!-- 1. GOL -->
+                  <button type="button" class="pitch-pin" data-pos="GOL" style="top: 86%; left: 50%;" title="Goleiro">
+                    <span class="pin-icon">🧤</span>
+                    <span class="pin-code">GOL</span>
+                  </button>
+                  <!-- 2. ZAG -->
+                  <button type="button" class="pitch-pin" data-pos="ZAG" style="top: 72%; left: 50%;" title="Zagueiro">
+                    <span class="pin-icon">🛡️</span>
+                    <span class="pin-code">ZAG</span>
+                  </button>
+                  <!-- 3. LE -->
+                  <button type="button" class="pitch-pin" data-pos="LE" style="top: 68%; left: 16%;" title="Lateral-Esquerdo">
+                    <span class="pin-icon">🏃‍♂️</span>
+                    <span class="pin-code">LE</span>
+                  </button>
+                  <!-- 4. LD -->
+                  <button type="button" class="pitch-pin" data-pos="LD" style="top: 68%; left: 84%;" title="Lateral-Direito">
+                    <span class="pin-icon">🏃‍♂️</span>
+                    <span class="pin-code">LD</span>
+                  </button>
+                  <!-- 5. VOL -->
+                  <button type="button" class="pitch-pin" data-pos="VOL" style="top: 55%; left: 50%;" title="Primeiro Volante">
+                    <span class="pin-icon">🧱</span>
+                    <span class="pin-code">VOL</span>
+                  </button>
+                  <!-- 6. MC -->
+                  <button type="button" class="pitch-pin" data-pos="MC" style="top: 44%; left: 32%;" title="Meia Central">
+                    <span class="pin-icon">⚙️</span>
+                    <span class="pin-code">MC</span>
+                  </button>
+                  <!-- 7. MEI -->
+                  <button type="button" class="pitch-pin" data-pos="MEI" style="top: 36%; left: 68%;" title="Meia-Atacante / Armador">
+                    <span class="pin-icon">🎯</span>
+                    <span class="pin-code">MEI</span>
+                  </button>
+                  <!-- 8. PE -->
+                  <button type="button" class="pitch-pin" data-pos="PE" style="top: 20%; left: 18%;" title="Ponta-Esquerda">
+                    <span class="pin-icon">⚡</span>
+                    <span class="pin-code">PE</span>
+                  </button>
+                  <!-- 9. PD -->
+                  <button type="button" class="pitch-pin" data-pos="PD" style="top: 20%; left: 82%;" title="Ponta-Direita">
+                    <span class="pin-icon">⚡</span>
+                    <span class="pin-code">PD</span>
+                  </button>
+                  <!-- 10. CA -->
+                  <button type="button" class="pitch-pin active" data-pos="CA" style="top: 10%; left: 50%;" title="Centroavante (Camisa 9)">
+                    <span class="pin-icon">⚽</span>
+                    <span class="pin-code">CA</span>
+                  </button>
+                </div>
               </div>
             </div>
 
             <!-- Arquétipo de Jogo -->
             <div class="form-group">
               <label class="form-label" for="player-archetype">Estilo de Jogo / Arquétipo</label>
-              <select id="player-archetype" class="form-select">
-                <option value="matador">Matador de Área (+Finalização e Faro de Gol)</option>
-                <option value="ponta_veloz">Ponta Veloz (+Dribles e Assistências)</option>
-                <option value="guerreiro_tatico">Atacante Tático (+Regularidade e Nota Média)</option>
-              </select>
+              <select id="player-archetype" class="form-select"></select>
               <div class="form-hint" id="archetype-desc">Focado em empurrar a bola para a rede e decidir clássicos.</div>
             </div>
 
-            <!-- Clube de Origem -->
+            <!-- 3 Clubes Formadores Sorteados Aleatoriamente -->
             <div class="form-group">
-              <label class="form-label" for="player-club">Clube de Formação / Estreia</label>
-              <select id="player-club" class="form-select">
-                <option value="santos">Santos FC (Base dos Meninos da Vila - Série B/A)</option>
-                <option value="fluminense">Fluminense (Xerém - Celeiro de Craques)</option>
-                <option value="coritiba">Coritiba (Tradição e Oportunidades)</option>
-                <option value="ponte_preta">Ponte Preta (Raça e Vitrine Paulista)</option>
-                <option value="sport">Sport Recife (Leão da Ilha)</option>
-              </select>
-              <div class="form-hint">Clubes formadores dão mais minutos para jovens no início da carreira.</div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                <label class="form-label" style="margin-bottom: 0;">Clube de Formação (3 Ofertas de Base)</label>
+                <button type="button" id="btn-reroll-clubs" class="btn btn-secondary btn-sm" title="Sortear outros 3 clubes">
+                  🎲 Sortear Outros
+                </button>
+              </div>
+              <div id="starting-clubs-grid" class="starting-clubs-grid">
+                <!-- Cards de clubes sorteados injetados dinamicamente via renderer.js -->
+              </div>
+              <input type="hidden" id="player-club" value="">
+              <div class="form-hint">O Overall inicial do atleta é exatamente o mesmo em qualquer clube (65 OVR). Escolha pelo coração ou desafio!</div>
             </div>
+
 
             <button type="submit" id="btn-start-career" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;">
               🚀 Iniciar Nova Carreira

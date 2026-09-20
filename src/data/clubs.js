@@ -277,6 +277,128 @@ export const CLUBS = [
   },
 
   // ==========================================
+  // BRASIL: CLUBES REGIONAIS, TRADICIONAIS E ACESSO
+  // ==========================================
+  {
+    id: "remo",
+    name: "Clube do Remo",
+    shortName: "Remo",
+    country: "Brasil",
+    region: "brazil",
+    tier: 4,
+    overall: 65,
+    reputation: 68,
+    financialPower: 1,
+    colors: { primary: "#001e44", secondary: "#ffffff", text: "#ffffff" },
+    emoji: "🦁"
+  },
+  {
+    id: "paysandu",
+    name: "Paysandu Sport Club",
+    shortName: "Paysandu",
+    country: "Brasil",
+    region: "brazil",
+    tier: 4,
+    overall: 65,
+    reputation: 68,
+    financialPower: 1,
+    colors: { primary: "#0099db", secondary: "#ffffff", text: "#ffffff" },
+    emoji: "🐺"
+  },
+  {
+    id: "criciuma",
+    name: "Criciúma Esporte Clube",
+    shortName: "Criciúma",
+    country: "Brasil",
+    region: "brazil",
+    tier: 3,
+    overall: 68,
+    reputation: 70,
+    financialPower: 2,
+    colors: { primary: "#fdd100", secondary: "#111111", text: "#111111" },
+    emoji: "🐯"
+  },
+  {
+    id: "chapecoense",
+    name: "Associação Chapecoense de Futebol",
+    shortName: "Chapecoense",
+    country: "Brasil",
+    region: "brazil",
+    tier: 3,
+    overall: 67,
+    reputation: 73,
+    financialPower: 2,
+    colors: { primary: "#006437", secondary: "#ffffff", text: "#ffffff" },
+    emoji: "🏹"
+  },
+  {
+    id: "juventude",
+    name: "Esporte Clube Juventude",
+    shortName: "Juventude",
+    country: "Brasil",
+    region: "brazil",
+    tier: 3,
+    overall: 68,
+    reputation: 70,
+    financialPower: 2,
+    colors: { primary: "#00843d", secondary: "#ffffff", text: "#ffffff" },
+    emoji: "🟢⚪"
+  },
+  {
+    id: "nautico",
+    name: "Clube Náutico Capibaribe",
+    shortName: "Náutico",
+    country: "Brasil",
+    region: "brazil",
+    tier: 4,
+    overall: 64,
+    reputation: 67,
+    financialPower: 1,
+    colors: { primary: "#e30613", secondary: "#ffffff", text: "#ffffff" },
+    emoji: "🔴⚪"
+  },
+  {
+    id: "santa_cruz",
+    name: "Santa Cruz Futebol Clube",
+    shortName: "Santa Cruz",
+    country: "Brasil",
+    region: "brazil",
+    tier: 4,
+    overall: 63,
+    reputation: 69, // Grande massa torcedora
+    financialPower: 1,
+    colors: { primary: "#000000", secondary: "#ffffff", text: "#ffffff" },
+    emoji: "🐍"
+  },
+  {
+    id: "vila_nova",
+    name: "Vila Nova Futebol Clube",
+    shortName: "Vila Nova",
+    country: "Brasil",
+    region: "brazil",
+    tier: 4,
+    overall: 65,
+    reputation: 66,
+    financialPower: 1,
+    colors: { primary: "#c8102e", secondary: "#ffffff", text: "#ffffff" },
+    emoji: "🐅"
+  },
+  {
+    id: "avai",
+    name: "Avaí Futebol Clube",
+    shortName: "Avaí",
+    country: "Brasil",
+    region: "brazil",
+    tier: 3,
+    overall: 67,
+    reputation: 69,
+    financialPower: 2,
+    colors: { primary: "#0055a5", secondary: "#ffffff", text: "#ffffff" },
+    emoji: "🦁"
+  },
+
+
+  // ==========================================
   // EUROPA / MUNDO: TIER 1 (SUPERPOTÊNCIAS GLOBAIS)
   // ==========================================
   {
@@ -425,12 +547,25 @@ export function getClubById(id) {
 }
 
 /**
- * Lista clubes formadores disponíveis para o início de carreira (Tier 3 ou base de tradicionais)
+ * Sorteia N clubes brasileiros aleatórios de qualquer escalão para serem opções de início de carreira
+ * (Pode vir de um Flamengo/Palmeiras a um Remo/Paysandu)
+ * @param {number} count 
+ * @returns {Array<object>}
+ */
+export function getRandomStartingClubs(count = 3) {
+  const brazilianClubs = CLUBS.filter(c => c.region === "brazil");
+  const shuffled = [...brazilianClubs].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, Math.min(count, shuffled.length));
+}
+
+/**
+ * Lista clubes formadores padrão (fallback retrocompatível)
  * @returns {Array<object>}
  */
 export function getStartingClubs() {
-  return CLUBS.filter(c => c.region === "brazil" && (c.tier === 3 || c.id === "fluminense" || c.id === "santos"));
+  return getRandomStartingClubs(3);
 }
+
 
 /**
  * Filtra clubes compatíveis para transferência com base no Overall e Reputação do atleta

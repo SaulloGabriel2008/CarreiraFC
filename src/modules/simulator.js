@@ -167,20 +167,36 @@ export class SeasonSimulator {
     const archMods = archetype.modifiers || {};
     const pos = player.position;
 
-    // 1. Taxas base por posição
-    let baseGoalRate = 0.48; // ATA
-    let baseAssistRate = 0.18;
+    // 1. Taxas base calibradas por posição
+    let baseGoalRate = 0.52; // CA padrão
+    let baseAssistRate = 0.12;
 
-    if (pos === "MEI") {
-      baseGoalRate = 0.16;
-      baseAssistRate = 0.32;
-    } else if (pos === "ZAG") {
-      baseGoalRate = 0.04; // Bolas paradas / escanteios
-      baseAssistRate = 0.03;
-    } else if (pos === "GOL") {
-      baseGoalRate = archetype.id === "goleiro_artilheiro" ? 0.03 : 0.00;
+    if (pos === "GOL") {
+      baseGoalRate = archetype.id === "goleiro_artilheiro" ? 0.025 : 0.00;
       baseAssistRate = 0.005;
+    } else if (pos === "ZAG") {
+      baseGoalRate = 0.035; // Bolas paradas / escanteios
+      baseAssistRate = 0.02;
+    } else if (pos === "LD" || pos === "LE") {
+      baseGoalRate = 0.04;
+      baseAssistRate = 0.22; // Laterais chegam à linha de fundo
+    } else if (pos === "VOL") {
+      baseGoalRate = 0.07;
+      baseAssistRate = 0.12;
+    } else if (pos === "MC") {
+      baseGoalRate = 0.14;
+      baseAssistRate = 0.25;
+    } else if (pos === "MEI") {
+      baseGoalRate = 0.20;
+      baseAssistRate = 0.35; // O maestro das assistências
+    } else if (pos === "PE" || pos === "PD") {
+      baseGoalRate = 0.32;
+      baseAssistRate = 0.26;
+    } else if (pos === "CA") {
+      baseGoalRate = 0.54; // Camisa 9 artilheiro
+      baseAssistRate = 0.12;
     }
+
 
     // 2. Multiplicadores de Força e Qualidade
     // Overall do atleta (ex: OVR 85 gera ~1.38x mais gols que OVR 70)
