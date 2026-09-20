@@ -146,6 +146,7 @@ export function renderDashboard(player, currentYear = 2026) {
   const overallEl = document.getElementById('dash-overall');
   const physicalEl = document.getElementById('dash-physical');
   const tournamentBadge = document.getElementById('dash-tournament-badge');
+  const btnSimulate = document.getElementById('btn-simulate-season');
 
   if (avatarEl) avatarEl.textContent = positionInfo.icon;
   if (nameEl) {
@@ -159,7 +160,7 @@ export function renderDashboard(player, currentYear = 2026) {
     clubNameEl.textContent = `${club.emoji} ${club.shortName || club.name}`;
   }
   if (ageEl) {
-    ageEl.textContent = `${player.age} anos`;
+    ageEl.innerHTML = `${player.age} anos • <span style="color: var(--accent-green);">${formatMoney(player.marketValue)}</span>`;
   }
   if (overallEl) {
     overallEl.textContent = player.overall;
@@ -169,6 +170,9 @@ export function renderDashboard(player, currentYear = 2026) {
   }
   if (tournamentBadge) {
     tournamentBadge.textContent = `🏆 Temporada ${currentYear}`;
+  }
+  if (btnSimulate) {
+    btnSimulate.innerHTML = `⚽ Simular Temporada ${currentYear}`;
   }
 
   // 3. Sala de Troféus
@@ -201,7 +205,7 @@ export function renderDashboard(player, currentYear = 2026) {
   // 4. Totais de Carreira
   const careerTotalsEl = document.getElementById('dash-career-totals');
   if (careerTotalsEl) {
-    careerTotalsEl.textContent = `${player.careerStats.totalGames} J | ${player.careerStats.totalGoals} G | ${player.careerStats.totalAssists} A`;
+    careerTotalsEl.textContent = `${player.careerStats.totalGames} J | ${player.careerStats.totalGoals} G | ${player.careerStats.totalAssists} A | Nota: ${player.careerStats.averageRating || '0.0'}`;
   }
 
   // 5. Tabela de Histórico de Temporadas
@@ -238,4 +242,99 @@ export function renderDashboard(player, currentYear = 2026) {
       });
     }
   }
+}
+
+/**
+ * Exibe o Modal Festivo de Resumo da Temporada Recém-Simulada
+ * @param {object} seasonReport Relatório do SeasonSimulator
+ * @param {object} progression Relatório de evolução de applyAgeProgression()
+ * @param {Function} onContinueCallback Função ao clicar em avançar
+ */
+export function showSeasonModal(seasonReport, progression, onContinueCallback) {
+  const modalContainer = document.getElementById('modal-container');
+  const modalTitle = document.getElementById('modal-title');
+  const modalBody = document.getElementById('modal-body');
+  const modalBtn = document.getElementById('modal-btn-confirm');
+
+  if (!modalContainer || !modalBody) return;
+
+  modalTitle.innerHTML = `🏁 Fim da Temporada ${seasonReport.year} • ${seasonReport.clubName}`;
+
+  // Monta lista de competições disputadas
+  const compsHtml = seasonReport.competitionsSummary.map(comp => `
+    <div class="comp-item ${comp.won ? 'comp-champion' : ''}">
+      <span>${comp.won ? '🏆' : '⚽'} <b>${comp.name}</b> (${comp.stageReached})</span>
+      <span style="font-size: 0.8rem; color: var(--text-secondary);">
+        ${comp.playerGames}J | ${comp.playerGoals}G | ${comp.playerAssists}A • <b style="color: var(--accent-gold);">${comp.rating}</b>
+      </span>
+    </div>
+  `).join('');
+
+  // Mensagem de evolução etária
+  const ovrSign = progression.overallDelta >= 0 ? `+${progression.overallDelta}` : `${progression.overallDelta}`;
+  const ovrClass = progression.overallDelta >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+  
+  const progressionText = `
+    <div class="progression-banner">
+      <span style="font-size: 1.3rem;">🚀</span>
+      <div>
+        <b>Evolução Anual (${progression.age} anos)</b>: Overall <b style="color: ${ovrClass};">${ovrSign}</b> (Novo OVR: ${progression.newOverall}) &bull; Físico: <b>${progression.newPhysical}</b>
+      </div>
+    </div>
+  `;
+
+  // Alerta de lesão se ocorreu
+  const injuryHtml = seasonReport.injuryOccurred ? `
+    <div class="injury-alert-banner">
+      <span>⚠️</span>
+      <div>
+        <b>Fisgada Muscular!</b> Você sofreu uma lesão no meio do ano e perdeu algumas partidas importantes.
+      </div>
+    </div>
+  ` : '';
+
+  modalBody.innerHTML = `
+    <div class="season-summary-content">
+      <!-- Grid de Estatísticas do Ano -->
+      <div class="season-summary-grid">
+        <div class="season-stat-box">
+          <div class="season-stat-val">${seasonReport.games}</div>
+          <div class="season-stat-lbl">Partidas</div>
+        </div>
+        <div class="season-stat-box" style="border-color: var(--accent-green);">
+          <div class="season-stat-val" style="color: var(--accent-green);">${seasonReport.goals}</div>
+          <div class="season-stat-lbl">Gols</div>
+        </div>
+        <div class="season-stat-box" style="border-color: var(--accent-blue);">
+          <div class="season-stat-val" style="color: var(--accent-blue);">${seasonReport.assists}</div>
+          <div class="season-stat-lbl">Assists</div>
+        </div>
+        <div class="season-stat-box" style="border-color: var(--accent-gold);">
+          <div class="season-stat-val" style="color: var(--accent-gold);">${seasonReport.avgRating}</div>
+          <div class="season-stat-lbl">Nota Média</div>
+        </div>
+      </div>
+
+      ${injuryHtml}
+
+      <!-- Competições e Fases -->
+      <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-top: 0.25rem;">
+        Desempenho por Torneio
+      </div>
+      <div class="competitions-list">
+        ${compsHtml}
+      </div>
+
+      <!-- Evolução de Atributos -->
+      ${progressionText}
+    </div>
+  `;
+
+  modalBtn.textContent = `Continuar para ${seasonReport.year + 1} ➡️`;
+  modalBtn.onclick = () => {
+    modalContainer.classList.remove('active');
+    if (onContinueCallback) onContinueCallback();
+  };
+
+  modalContainer.classList.add('active');
 }

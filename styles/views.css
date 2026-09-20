@@ -322,17 +322,94 @@
   flex-wrap: wrap;
 }
 
+/* --------------------------------------------------------------------------
+   MODAL DE RESUMO DA TEMPORADA
+   -------------------------------------------------------------------------- */
+.season-summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.season-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.season-stat-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.5rem;
+  text-align: center;
+}
+
+.season-stat-val {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1.1;
+}
+
+.season-stat-lbl {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.competitions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.comp-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.85rem;
+  font-size: 0.84rem;
+}
+
+.comp-item.comp-champion {
+  border-color: var(--border-gold);
+  background: rgba(255, 193, 7, 0.08);
+}
+
+.progression-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: rgba(0, 230, 118, 0.1);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+.injury-alert-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: rgba(255, 82, 82, 0.1);
+  border: 1px solid rgba(255, 82, 82, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 0.9rem;
+  font-size: 0.84rem;
+  color: #ff8a80;
+}
+
 @media (max-width: 600px) {
-  .position-selector-grid {
+  .season-summary-grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .legacy-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .player-banner {
-    flex-direction: column;
-    align-items: flex-start;
   }
 }
+

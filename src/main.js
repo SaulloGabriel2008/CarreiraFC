@@ -1,12 +1,13 @@
 /**
  * CARREIRA FC - MAIN BOOTSTRAPPER & GAME STATE MANAGER
- * Orquestrador central: Inicializa o fluxo de criação, gerencia as transições de tela
- * e mantém o estado global acessível para módulos e depuração.
+ * Orquestrador central: Inicializa o fluxo de criação, gerencia o ciclo anual das temporadas,
+ * conecta o motor matemático ao dashboard e controla as transições entre views.
  */
 
 import { Player } from './modules/player.js';
+import { SeasonSimulator } from './modules/simulator.js';
 import { getClubById } from './data/clubs.js';
-import { initCreationForm, renderDashboard } from './ui/renderer.js';
+import { initCreationForm, renderDashboard, showSeasonModal } from './ui/renderer.js';
 
 // Estado Global Central da Aplicação
 export const gameState = {
@@ -23,7 +24,7 @@ if (typeof window !== 'undefined') {
 
 /**
  * Alterna a visualização entre as views principais com animação suave
- * @param {'creation' | 'dashboard' | 'event' | 'retirement'} viewId
+ * @param {'creation' | 'dashboard' | 'event' | 'retirement'} viewId 
  */
 export function switchView(viewId) {
   const views = {
@@ -76,7 +77,7 @@ export function showToast(message, type = 'success', durationMs = 3000) {
  * @param {object} creationParams { name, nickname, position, archetype, currentClubId }
  */
 export function handleStartCareer(creationParams) {
-  // 1. Instancia o objeto do Atleta com atributos da posição
+  // 1. Instancia o atleta aos 17 anos com arquétipo e clube
   const player = new Player({
     name: creationParams.name,
     nickname: creationParams.nickname,
@@ -101,12 +102,98 @@ export function handleStartCareer(creationParams) {
   showToast(`Carreira iniciada no ${clubName}! Mostre seu valor, garoto!`, 'gold', 4000);
 }
 
+/**
+ * Executa a simulação completa da temporada anual
+ */
+export function handleSimulateSeason() {
+  if (!gameState.player) return;
+
+  if (gameState.player.isRetired) {
+    showToast("Este atleta já encerrou a carreira profissional.", "danger");
+    return;
+  }
+
+  const btnSimulate = document.getElementById('btn-simulate-season');
+  if (btnSimulate) {
+    btnSimulate.disabled = true;
+    btnSimulate.innerHTML = `⚽ Simulando...`;
+  }
+
+  // Pequeno delay sensorial (200ms) para dar sensação de processamento esportivo
+  setTimeout(() => {
+    // 1. Simula os resultados esportivos pelo SeasonSimulator
+    const seasonReport = SeasonSimulator.simulateSeason(gameState.player, gameState.currentYear);
+
+    // 2. Registra o histórico e atualiza acumuladores de carreira
+    gameState.player.addSeasonRecord(seasonReport);
+
+    // 3. Aplica a curva etária anual (evolução juvenil ou declínio físico)
+    const progression = gameState.player.applyAgeProgression();
+
+    // 4. Notificações rápidas na tela
+    if (seasonReport.trophiesWon.length > 0) {
+      const trophyNames = seasonReport.trophiesWon.map(t => t.name).join(', ');
+      showToast(`🏆 É CAMPEÃO! Você levantou a taça: ${trophyNames}!`, 'gold', 4500);
+    } else {
+      showToast(`Temporada ${gameState.currentYear} concluída com ${seasonReport.goals} gols e ${seasonReport.assists} assistências!`, 'success', 3000);
+    }
+
+    // 5. Exibe o Modal comemorativo detalhado com resumo das competições e evolução
+    showSeasonModal(seasonReport, progression, () => {
+      // Callback disparado ao clicar em "Continuar para [Próximo Ano]"
+      gameState.currentYear += 1;
+      renderDashboard(gameState.player, gameState.currentYear);
+
+      // Se o jogador se aposentou por idade/desgaste físico
+      if (gameState.player.isRetired) {
+        showToast(`Aos ${gameState.player.age} anos, sua carreira nos gramados chegou ao fim!`, 'gold', 5000);
+        switchView('retirement');
+      }
+    });
+
+    if (btnSimulate) {
+      btnSimulate.disabled = false;
+      btnSimulate.innerHTML = `⚽ Simular Temporada ${gameState.currentYear}`;
+    }
+  }, 200);
+}
+
 // Inicialização de Listeners e ciclo de vida
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('⚽ Carreira FC: Inicializando motor de jogo [Prompt 4 Ativo].');
+  console.log('⚽ Carreira FC: Inicializando motor de jogo [Prompt 6 Ativo].');
 
   // Inicializa o formulário de criação com callbacks
   initCreationForm(handleStartCareer);
+
+  // Botão "Simular Temporada" conectado ao motor
+  const btnSimulate = document.getElementById('btn-simulate-season');
+  if (btnSimulate) {
+    btnSimulate.addEventListener('click', handleSimulateSeason);
+  }
+
+  // Botão "Pendurar Chuteiras" (Aposentadoria voluntária)
+  const btnRetire = document.getElementById('btn-retire-early');
+  if (btnRetire) {
+    btnRetire.addEventListener('click', () => {
+      if (!gameState.player || gameState.player.isRetired) return;
+      if (confirm("Tem certeza que deseja pendurar as chuteiras e encerrar sua carreira agora?")) {
+        gameState.player.retire("Aposentadoria voluntária do atleta.");
+        renderDashboard(gameState.player, gameState.currentYear);
+        showToast("Carreira encerrada! Confira seu legado final.", "gold", 3500);
+        switchView('retirement');
+      }
+    });
+  }
+
+  // Botão "Nova Carreira" na tela de aposentadoria
+  const btnPlayAgain = document.getElementById('btn-play-again');
+  if (btnPlayAgain) {
+    btnPlayAgain.addEventListener('click', () => {
+      gameState.player = null;
+      gameState.currentYear = 2026;
+      switchView('creation');
+    });
+  }
 
   // Botão de alternância de som / efeito
   const btnSound = document.getElementById('btn-sound-toggle');
@@ -115,14 +202,6 @@ document.addEventListener('DOMContentLoaded', () => {
       gameState.isAudioEnabled = !gameState.isAudioEnabled;
       btnSound.textContent = gameState.isAudioEnabled ? '🔊' : '🔇';
       showToast(gameState.isAudioEnabled ? 'Efeitos ativados' : 'Efeitos silenciados', 'gold', 1500);
-    });
-  }
-
-  // Placeholder para o botão Simular Temporada (será conectado ao motor no Prompt 5)
-  const btnSimulate = document.getElementById('btn-simulate-season');
-  if (btnSimulate) {
-    btnSimulate.addEventListener('click', () => {
-      showToast("Motor de Simulação será conectado no Prompt 5!", "gold", 2500);
     });
   }
 
